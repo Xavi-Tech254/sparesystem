@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+<title>CLINTON HARDWARE SYSTEM</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&family=Barlow+Condensed:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --primary:#f59e0b;--primary-dark:#d97706;--primary-light:#fef3c7;
+  --steel:#1e3a5f;--steel2:#2d5282;
+  --success:#10b981;--danger:#ef4444;--warning:#f59e0b;--info:#3b82f6;
+  --bg:#f0f4f8;--surface:#fff;--surface2:#f7f9fc;
+  --text:#0f1923;--text2:#5a6a7a;--border:#dde3ea;
+  --nav-bg:#1e3a5f;--nav-text:#e2e8f0;--nav-active:#f59e0b;
+  --tag-cat-bg:#e0f2fe;--tag-cat-txt:#0369a1;
+  --tag-sup-bg:#f0fdf4;--tag-sup-txt:#166534;
+  --low-row:#fff8e1;
+}
+[data-theme="dark"]{
+  --bg:#0d1b2a;--surface:#1a2a3a;--surface2:#1f3245;
+  --text:#e8f0f8;--text2:#8aa0b8;--border:#2a3f55;
+  --nav-bg:#0d1b2a;--tag-cat-bg:#0c4a6e;--tag-cat-txt:#bae6fd;
+  --tag-sup-bg:#052e16;--tag-sup-txt:#86efac;--low-row:#2d1f00;
+}
+body{font-family:'Barlow',sans-serif;background:var(--bg);min-height:100vh;color:var(--text);transition:background .3s,color .3s;}
+
+/* ===== LOGIN ===== */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#0d1b2a 0%,#1e3a5f 50%,#0d1b2a 100%);padding:20px;position:relative;overflow:hidden;}
+.login-wrap::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 60px,rgba(245,158,11,.03) 60px,rgba(245,158,11,.03) 61px),repeating-linear-gradient(90deg,transparent,transparent 60px,rgba(245,158,11,.03) 60px,rgba(245,158,11,.03) 61px);}
+.login-box{background:var(--surface);padding:40px 32px;border-radius:16px;width:380px;max-width:100%;text-align:center;border:1px solid var(--border);box-shadow:0 24px 64px rgba(0,0,0,.4);position:relative;z-index:1;}
+.login-icon{width:76px;height:76px;border-radius:14px;background:linear-gradient(135deg,#f59e0b,#d97706);margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 8px 24px rgba(245,158,11,.4);}
+.login-box h1{font-family:'Barlow Condensed',sans-serif;color:var(--text);font-size:26px;font-weight:900;letter-spacing:1px;margin-bottom:2px;}
+.login-box .sub{font-size:12px;color:var(--text2);margin-bottom:24px;letter-spacing:.5px;}
+.login-box input{width:100%;padding:12px 14px;margin:6px 0;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:'Barlow',sans-serif;background:var(--surface2);color:var(--text);transition:border-color .2s;}
+.login-box input:focus{outline:none;border-color:var(--primary);}
+.login-box button{width:100%;padding:13px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:800;font-family:'Barlow',sans-serif;cursor:pointer;letter-spacing:.5px;margin-top:8px;transition:all .2s;}
+.login-box button:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(245,158,11,.4);}
+.error-msg{color:var(--danger);margin-top:8px;font-size:13px;}
+
+/* ===== APP SHELL ===== */
+.app-container{display:none;padding-bottom:70px;}
+.top-header{background:var(--nav-bg);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px;position:sticky;top:0;z-index:99;border-bottom:2px solid var(--primary);}
+.header-logo{display:flex;align-items:center;gap:10px;}
+.header-icon{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,#f59e0b,#d97706);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.logo h2{font-family:'Barlow Condensed',sans-serif;color:#fff;font-size:17px;font-weight:900;letter-spacing:1px;line-height:1.1;}
+.logo p{font-size:9px;color:#94a3b8;letter-spacing:.5px;}
+.header-right{display:flex;align-items:center;gap:6px;}
+.theme-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:5px 9px;border-radius:8px;font-size:13px;cursor:pointer;}
+.logout-btn{background:var(--danger);color:#fff;border:none;padding:5px 10px;border-radius:8px;font-size:12px;cursor:pointer;}
+
+/* ===== BOTTOM NAV ===== */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--nav-bg);display:flex;justify-content:space-around;padding:5px 0 7px;box-shadow:0 -2px 10px rgba(0,0,0,.3);z-index:100;border-top:2px solid rgba(245,158,11,.3);}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;color:#94a3b8;font-size:9px;padding:4px 5px;border-radius:8px;transition:all .2s;font-family:'Barlow',sans-serif;font-weight:600;}
+.nav-item i{font-size:16px;}
+.nav-item.active{color:var(--primary);}
+
+/* ===== CONTENT ===== */
+.content{padding:12px;}
+.page{display:none;animation:fadeIn .2s;}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+/* ===== STATS ===== */
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;}
+.stat-card{background:var(--surface);padding:13px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);display:flex;justify-content:space-between;align-items:center;border:1px solid var(--border);}
+.stat-info h4{color:var(--text2);font-size:9px;margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px;font-weight:700;}
+.stat-info .value{font-size:17px;font-weight:800;color:var(--text);}
+.stat-icon{font-size:24px;color:var(--primary);opacity:.9;}
+.charts-row{display:grid;gap:12px;margin-bottom:14px;}
+.chart-card{background:var(--surface);padding:13px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);border:1px solid var(--border);}
+.chart-card h3{font-size:12px;margin-bottom:8px;color:var(--text);font-weight:700;}
+canvas{max-height:160px;}
+
+/* ===== TABLE ===== */
+.table-wrap{background:var(--surface);border-radius:12px;overflow-x:auto;box-shadow:0 2px 8px rgba(0,0,0,.06);border:1px solid var(--border);}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th,td{padding:9px 8px;text-align:left;border-bottom:1px solid var(--border);}
+th{background:var(--surface2);font-weight:700;color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:.4px;}
+td{color:var(--text);}
+tr:last-child td{border-bottom:none;}
+tfoot tr{background:var(--surface2);}
+tfoot td{padding:9px 8px;font-weight:800;font-size:12px;border-top:2px solid var(--primary);color:var(--text);}
+tfoot .tlbl{color:var(--primary);font-size:10px;text-transform:uppercase;letter-spacing:.4px;}
+
+/* ===== BUTTONS ===== */
+.btn{padding:7px 13px;border:none;border-radius:9px;cursor:pointer;font-size:12px;font-weight:700;font-family:'Barlow',sans-serif;transition:all .2s;display:inline-flex;align-items:center;gap:5px;}
+.btn-primary{background:var(--primary);color:#fff;}.btn-primary:hover{background:var(--primary-dark);}
+.btn-danger{background:var(--danger);color:#fff;}
+.btn-success{background:var(--success);color:#fff;}
+.btn-warning{background:var(--warning);color:#fff;}
+.btn-steel{background:var(--steel);color:#fff;}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text2);}
+.btn-sm{padding:4px 9px;font-size:11px;border-radius:7px;}
+
+/* ===== TOOLBAR ===== */
+.filter-bar{display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap;align-items:center;}
+.filter-bar input,.filter-bar select{padding:7px 9px;border:1.5px solid var(--border);border-radius:9px;font-size:12px;flex:1;min-width:90px;background:var(--surface);color:var(--text);font-family:'Barlow',sans-serif;}
+.page-toolbar{margin-bottom:11px;display:flex;gap:7px;flex-wrap:wrap;align-items:center;}
+
+/* ===== MODAL ===== */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;align-items:center;justify-content:center;padding:14px;}
+.modal-content{background:var(--surface);padding:20px;border-radius:16px;width:100%;max-width:480px;max-height:88vh;overflow-y:auto;border:1px solid var(--border);}
+.modal-content h2{font-size:16px;margin-bottom:14px;color:var(--text);font-weight:800;font-family:'Barlow Condensed',sans-serif;letter-spacing:.5px;}
+.modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:16px;}
+.form-group{margin-bottom:10px;}
+.form-group label{display:block;margin-bottom:3px;font-weight:700;color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:.4px;}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:9px;border:1.5px solid var(--border);border-radius:9px;font-size:14px;background:var(--surface2);color:var(--text);font-family:'Barlow',sans-serif;}
+.form-group textarea{resize:vertical;min-height:60px;}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--primary);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.form-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;}
+
+/* ===== TAGS ===== */
+.tag{padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;display:inline-block;}
+.tag-paid{background:#d1fae5;color:#065f46;}
+.tag-partial{background:#fed7aa;color:#9a3412;}
+.tag-pending{background:#fee2e2;color:#991b1b;}
+.tag-cat{background:var(--tag-cat-bg);color:var(--tag-cat-txt);}
+.tag-sup{background:var(--tag-sup-bg);color:var(--tag-sup-txt);}
+.tag-unit{background:#ede9fe;color:#5b21b6;}
+
+/* ===== SECTION CARD ===== */
+.section-card{background:var(--surface);border-radius:12px;padding:14px;margin-bottom:12px;border:1px solid var(--border);box-shadow:0 2px 6px rgba(0,0,0,.04);}
+.section-card h4{font-size:13px;margin-bottom:10px;display:flex;align-items:center;gap:6px;font-weight:800;}
+
+/* ===== CHIPS ===== */
+.chip-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
+.chip{background:var(--surface2);border:1px solid var(--border);padding:4px 11px;border-radius:20px;font-size:11px;display:inline-flex;align-items:center;gap:5px;color:var(--text);}
+.chip i{color:var(--danger);cursor:pointer;font-size:10px;}
+
+/* ===== ALERTS ===== */
+.alert-box{padding:10px 13px;border-radius:10px;margin-bottom:10px;font-size:13px;}
+.alert-warning{background:#fef3c7;color:#92400e;border:1px solid #fcd34d;}
+.alert-success{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7;}
+.empty-state{text-align:center;padding:26px;color:var(--text2);}
+.empty-state i{font-size:32px;margin-bottom:7px;opacity:.3;display:block;}
+.low-stock-row{background:var(--low-row)!important;}
+
+/* ===== LOGO UPLOAD ===== */
+.logo-upload-area{border:2px dashed var(--border);border-radius:12px;padding:16px;text-align:center;cursor:pointer;transition:all .2s;}
+.logo-upload-area:hover{border-color:var(--primary);}
+.logo-preview{width:80px;height:80px;border-radius:12px;object-fit:cover;border:3px solid var(--primary);margin:0 auto 8px;display:block;}
+
+/* ===== REPORTS ===== */
+.report-container{background:var(--surface);padding:14px;border-radius:12px;margin-top:10px;border:1px solid var(--border);}
+.fin-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:0;}
+.fin-table td{padding:7px 10px;border-bottom:1px solid var(--border);color:var(--text);}
+.fin-table tr:last-child td{border-bottom:none;}
+.fin-total td{font-weight:900;font-size:13px;background:var(--steel);color:#fff!important;border-top:2px solid var(--primary);padding:10px 10px;}
+.fin-subtotal td{font-weight:800;background:var(--surface2);}
+.fin-subtotal2 td{font-weight:700;background:rgba(245,158,11,.08);border-top:1px solid rgba(245,158,11,.3);}
+.fin-indent td:first-child{padding-left:22px;color:var(--text2);font-size:11px;}
+.fin-indent td:last-child{font-size:11px;}
+.positive{color:var(--success)!important;}
+.negative{color:var(--danger)!important;}
+.fin-doc-title{font-size:13px;font-weight:900;color:#fff;background:var(--steel);padding:9px 14px;border-radius:8px 8px 0 0;margin-top:20px;letter-spacing:.3px;}
+.fin-subtitle{font-size:10px;color:#92400e;padding:5px 14px 8px;background:#fff7ed;border:1px solid #fed7aa;border-top:none;border-radius:0 0 0 0;margin-bottom:0;}
+.fin-table-wrap{border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;overflow:hidden;margin-bottom:6px;}
+
+/* ===== DANGER ZONE ===== */
+.danger-zone{background:#fff5f5;border:1.5px solid #fca5a5;border-radius:12px;padding:16px;margin-top:12px;}
+[data-theme="dark"] .danger-zone{background:#2d1515;}
+.danger-zone h4{color:var(--danger);margin-bottom:6px;font-size:13px;font-weight:800;}
+.danger-zone p{font-size:12px;color:var(--text2);margin-bottom:12px;}
+
+/* ===== CLOCK ===== */
+#hwClock{letter-spacing:1px;font-family:'Barlow Condensed',sans-serif;}
+
+/* ===== GUIDE ===== */
+.guide-block{margin-bottom:12px;padding:12px;background:var(--surface2);border-radius:10px;border-left:3px solid var(--primary);}
+.guide-title{font-size:12px;font-weight:800;color:var(--text);margin-bottom:4px;}
+.guide-body{font-size:12px;color:var(--text2);line-height:1.7;}
+
+/* ===== SUPPLIER BADGE ===== */
+.sup-badge{display:inline-flex;align-items:center;gap:4px;background:var(--tag-sup-bg);color:var(--tag-sup-txt);padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginPage" class="login-wrap">
+  <div class="login-box">
+    <div id="loginLogoWrap"><div class="login-icon">🔩</div></div>
+    <div style="font-size:11px;font-weight:700;color:var(--text2);letter-spacing:1px;margin-bottom:2px;" id="loginBizName">CLINTON HARDWARE</div>
+    <p class="sub" id="loginBizTagline">Hardware Management System</p>
+    <input type="text" id="loginUsername" placeholder="Username" autocomplete="off">
+    <input type="password" id="loginPassword" placeholder="Password" autocomplete="off">
+    <button onclick="handleLogin()"><i class="fas fa-sign-in-alt"></i> LOGIN</button>
+    <div id="loginError" class="error-msg"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appContainer" class="app-container">
+  <div class="top-header">
+    <div class="header-logo">
+      <div id="headerLogoWrap"><div class="header-icon">🔩</div></div>
+      <div class="logo"><h2 id="headerBizName">CLINTON HARDWARE</h2><p id="headerBizTagline">Management System</p></div>
+    </div>
+    <div class="header-right">
+      <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
+      <span style="font-size:11px;color:#94a3b8;"><i class="fas fa-user"></i> <span id="currentUser"></span></span>
+      <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page active">
+      <!-- Clock -->
+      <div style="background:var(--steel);border-radius:12px;padding:12px 16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;border:1px solid rgba(245,158,11,.3);">
+        <div>
+          <div style="font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;">Date &amp; Time</div>
+          <div id="hwClock" style="font-size:17px;font-weight:800;color:#fff;"></div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;">Day</div>
+          <div id="hwDay" style="font-size:14px;font-weight:700;color:var(--primary);font-family:'Barlow Condensed',sans-serif;"></div>
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-info"><h4>Total Items</h4><div class="value" id="statTotal">0</div></div><div class="stat-icon"><i class="fas fa-boxes"></i></div></div>
+        <div class="stat-card"><div class="stat-info"><h4>Today Sales</h4><div class="value" id="statSales">KES 0</div></div><div class="stat-icon"><i class="fas fa-cash-register"></i></div></div>
+        <div class="stat-card"><div class="stat-info"><h4>Low Stock</h4><div class="value" id="statLow">0</div></div><div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div></div>
+        <div class="stat-card"><div class="stat-info"><h4>Outstanding</h4><div class="value" id="statOutstanding">KES 0</div></div><div class="stat-icon"><i class="fas fa-file-invoice-dollar"></i></div></div>
+      </div>
+      <div class="charts-row">
+        <div class="chart-card"><h3>📈 Sales — Last 7 Days</h3><canvas id="salesChart"></canvas></div>
+        <div class="chart-card"><h3>🏆 Top Selling Items</h3><canvas id="topChart"></canvas></div>
+      </div>
+      <!-- Data Management -->
+      <div class="section-card">
+        <h4 style="color:var(--success)"><i class="fas fa-database"></i> Data Management</h4>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-primary btn-sm" onclick="exportData()"><i class="fas fa-download"></i> Export Backup</button>
+          <button class="btn btn-outline btn-sm" onclick="importData()"><i class="fas fa-upload"></i> Import Backup</button>
+        </div>
+        <p style="font-size:11px;margin-top:8px;color:var(--text2);">✓ Export backup regularly to keep your data safe.</p>
+        <div id="logoWarning" style="display:none;margin-top:8px;background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:8px 10px;font-size:11px;color:#991b1b;">⚠️ <strong>No logo uploaded!</strong> Upload your logo in Settings before printing documents.</div>
+      </div>
+      <!-- Developed by -->
+      <div class="section-card" style="border-color:#8b5cf6;">
+        <h4 style="color:#8b5cf6"><i class="fas fa-award"></i> Developed by Clinton Tech</h4>
+        <p style="font-size:12px;color:var(--text);line-height:1.7;margin-bottom:10px;">This system was professionally built by <strong>Clinton Tech</strong> — specialists in custom business systems, websites, and digital tools for SMEs.</p>
+        <div style="margin-top:10px;padding:12px 14px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);border-radius:10px;text-align:center;">
+          <p style="color:#fff;font-size:12px;font-weight:700;margin-bottom:6px;">Want your hardware shop online?</p>
+          <a href="tel:+254743810633" style="display:inline-flex;align-items:center;gap:8px;background:#f59e0b;color:#1e1b4b;padding:10px 20px;border-radius:30px;font-size:13px;font-weight:900;text-decoration:none;">
+            <i class="fas fa-phone-alt"></i> Call: 0743 810 633
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- STOCK -->
+    <div id="page-allstock" class="page">
+      <div class="filter-bar">
+        <input type="text" id="stockSearch" placeholder="🔍 Search items..." onkeyup="renderInventory()">
+        <select id="catFilter" onchange="renderInventory()"><option value="">All Categories</option></select>
+        <select id="supFilter" onchange="renderInventory()"><option value="">All Suppliers</option></select>
+        <button class="btn btn-primary btn-sm" onclick="openModal('addItemModal')"><i class="fas fa-plus"></i> Add</button>
+        <button class="btn btn-outline btn-sm" onclick="openModal('stockInModal')"><i class="fas fa-arrow-down"></i> Stock In</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Item</th><th>Category</th><th>Supplier</th><th>Unit</th><th>Qty</th><th>Buy</th><th>Sell</th><th></th></tr></thead>
+          <tbody id="stockTableBody"><tr><td colspan="8"><div class="empty-state"><i class="fas fa-box-open"></i><p>Loading...</p></div></td></tr></tbody>
+          <tfoot id="stockTFoot"></tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- SALES -->
+    <div id="page-sales" class="page">
+      <div class="page-toolbar">
+        <button class="btn btn-primary btn-sm" onclick="openModal('saleModal')"><i class="fas fa-plus"></i> New Sale</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Receipt</th><th>Date</th><th>Customer</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="salesTableBody"><tr><td colspan="6"><div class="empty-state">Loading...</div></td></tr></tbody>
+          <tfoot id="salesTFoot"></tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- EXPENSES -->
+    <div id="page-expenses" class="page">
+      <div class="page-toolbar">
+        <button class="btn btn-primary btn-sm" onclick="openModal('expenseModal')"><i class="fas fa-plus"></i> Add Expense</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Amount</th><th></th></tr></thead>
+          <tbody id="expensesTableBody"><tr><td colspan="5"><div class="empty-state">Loading...</div></td></tr></tbody>
+          <tfoot id="expTFoot"></tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- CREDITS -->
+    <div id="page-credits" class="page">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Customer</th><th>Receipt</th><th>Total</th><th>Paid</th><th>Balance</th><th>Action</th></tr></thead>
+          <tbody id="creditsTableBody"><tr><td colspan="6"><div class="empty-state">Loading...</div></td></tr></tbody>
+          <tfoot id="creditsTFoot"></tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- SUPPLIERS -->
+    <div id="page-suppliers" class="page">
+      <div class="page-toolbar">
+        <button class="btn btn-primary btn-sm" onclick="openModal('addSupplierModal')"><i class="fas fa-plus"></i> Add Supplier</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Supplier Name</th><th>Phone</th><th>Categories</th><th>Items Supplied</th><th></th></tr></thead>
+          <tbody id="suppliersTableBody"><tr><td colspan="5"><div class="empty-state"><i class="fas fa-truck"></i><p>No suppliers yet</p></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- REPORTS -->
+    <div id="page-reports" class="page">
+      <div class="filter-bar">
+        <select id="reportType" onchange="toggleReportDate()">
+          <option value="daily">Daily Report</option>
+          <option value="monthly">Monthly Report</option>
+        </select>
+        <input type="date" id="dailyDate">
+        <input type="month" id="monthlyDate" style="display:none">
+        <button class="btn btn-primary btn-sm" onclick="generateReport()"><i class="fas fa-chart-bar"></i> Generate</button>
+        <button class="btn btn-primary btn-sm" onclick="printReport()"><i class="fas fa-print"></i> Print</button>
+        <button class="btn btn-outline btn-sm" onclick="exportCurrentReport()"><i class="fas fa-download"></i> Export</button>
+      </div>
+      <div id="reportDisplay" class="report-container">
+        <div class="empty-state"><i class="fas fa-file-alt"></i><p>Select period then tap Generate</p></div>
+      </div>
+    </div>
+
+    <!-- GUIDE -->
+    <div id="page-guide" class="page">
+      <div class="section-card" style="border-color:var(--primary);">
+        <h4 style="color:var(--primary);font-size:15px;"><i class="fas fa-book-open"></i> System User Guide</h4>
+        <p style="font-size:12px;color:var(--text2);line-height:1.7;">Complete guide for CLINTON HARDWARE SYSTEM — hardware, plumbing, welding, roofing &amp; more.</p>
+      </div>
+      <div class="section-card">
+        <h4 style="color:var(--primary)"><i class="fas fa-compass"></i> How to Use Each Section</h4>
+        <div class="guide-block"><div class="guide-title">🏠 Dashboard</div><div class="guide-body">Overview of your business. Shows total items in stock, today's sales, low stock alerts, and outstanding debts. Charts show 7-day sales trend and top-selling items. Use Export Backup regularly to protect your data.</div></div>
+        <div class="guide-block"><div class="guide-title">📦 Stock</div><div class="guide-body">All hardware items with category, supplier, unit (pcs, metres, kg, rolls, bags, litres, sheets), buy/sell prices. Red rows = low stock. Add new items or use Stock In to replenish. Totals show stock value and potential profit.</div></div>
+        <div class="guide-block"><div class="guide-title">🛒 Sales</div><div class="guide-body">Record every sale. Select customer, item, quantity and price. Stock reduces automatically. Edit or delete sales — deleted sales restore stock. After each sale, share the receipt via WhatsApp, download, or print.</div></div>
+        <div class="guide-block"><div class="guide-title">🧾 Expenses</div><div class="guide-body">Record all running costs — rent, salaries, transport, electricity. Used in profit calculations. Without expenses, your profit will appear higher than it really is.</div></div>
+        <div class="guide-block"><div class="guide-title">💳 Credits</div><div class="guide-body">Customers with outstanding balances. Tap Pay to record payments. Once fully paid the customer is removed from this list.</div></div>
+        <div class="guide-block"><div class="guide-title">🚚 Suppliers</div><div class="guide-body">Manage your hardware suppliers. Add name, phone number, and what categories they supply. Each stock item can be linked to a supplier so you know who to call when restocking.</div></div>
+        <div class="guide-block"><div class="guide-title">📊 Reports</div><div class="guide-body">Daily or Monthly financial statements: Trading Account (Gross Profit), Profit &amp; Loss Account (Net Profit), and Balance Sheet. Print with your business logo or export as text.</div></div>
+        <div class="guide-block"><div class="guide-title">⚙️ Settings</div><div class="guide-body">Password-protected. Change business name, logo, tagline, username and password. Manage hardware categories and units of measure. Danger Zone lets you reset all data (auto-backup downloaded first).</div></div>
+      </div>
+      <div class="section-card" style="border-color:#8b5cf6;">
+        <h4 style="color:#8b5cf6"><i class="fas fa-award"></i> Developed by Clinton Tech</h4>
+        <div style="margin-top:10px;padding:12px 14px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);border-radius:10px;text-align:center;">
+          <p style="color:#fff;font-size:12px;font-weight:700;margin-bottom:6px;">Contact Clinton Tech</p>
+          <a href="tel:+254743810633" style="display:inline-flex;align-items:center;gap:8px;background:#f59e0b;color:#1e1b4b;padding:10px 20px;border-radius:30px;font-size:13px;font-weight:900;text-decoration:none;"><i class="fas fa-phone-alt"></i> 0743 810 633</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="page-settings" class="page">
+      <div class="section-card" style="border-color:var(--primary);">
+        <h4 style="color:var(--primary)"><i class="fas fa-id-card"></i> Business Profile &amp; Credentials</h4>
+        <div id="settingsLockPanel">
+          <p style="font-size:12px;color:var(--text2);margin-bottom:10px;">Enter your password to edit settings.</p>
+          <div class="form-group"><label>Current Password</label><input type="password" id="settingsUnlockPass" placeholder="Enter password"></div>
+          <button class="btn btn-primary btn-sm" onclick="unlockSettings()"><i class="fas fa-unlock"></i> Unlock</button>
+          <div id="settingsLockError" style="color:var(--danger);font-size:12px;margin-top:6px;"></div>
+        </div>
+        <div id="settingsEditPanel" style="display:none;">
+          <div style="background:var(--surface2);border-radius:8px;padding:9px 11px;margin-bottom:12px;font-size:12px;color:var(--success);border:1px solid var(--success);">🔓 Settings unlocked. Make changes and save.</div>
+          <div class="form-group"><label>Business Name</label><input type="text" id="setBizName" placeholder="e.g. CLINTON HARDWARE"></div>
+          <div class="form-group"><label>Tagline / Slogan</label><input type="text" id="setBizTagline" placeholder="e.g. Quality Hardware &amp; Building Materials"></div>
+          <div class="form-group"><label>Business Logo</label>
+            <div class="logo-upload-area" id="logoDropZone" onclick="document.getElementById('logoFileInput').click()" ondragover="event.preventDefault();this.style.borderColor='var(--primary)'" ondragleave="this.style.borderColor=''" ondrop="handleLogoDrop(event)">
+              <img id="logoPreviewImg" class="logo-preview" style="display:none">
+              <div id="logoPreviewPlaceholder"><i class="fas fa-cloud-upload-alt" style="font-size:24px;color:var(--primary);margin-bottom:6px;display:block;"></i><p style="font-size:12px;color:var(--text2);">Tap to upload logo</p></div>
+            </div>
+            <input type="file" id="logoFileInput" accept="image/*" style="display:none" onchange="handleLogoUpload(event)">
+            <button class="btn btn-danger btn-sm" onclick="removeLogo()" style="margin-top:8px;display:none" id="removeLogoBtn"><i class="fas fa-times"></i> Remove</button>
+          </div>
+          <div style="border-top:1px solid var(--border);margin:12px 0;padding-top:12px;">
+            <p style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">Login Credentials</p>
+            <p style="font-size:11px;color:var(--text2);margin-bottom:10px;">Current username: <strong id="currentCredDisplay"></strong></p>
+            <div class="form-group"><label>New Username (leave blank to keep)</label><input type="text" id="newUser" placeholder="Leave blank to keep current"></div>
+            <div class="form-group"><label>New Password (leave blank to keep)</label><input type="password" id="newPass" placeholder="Min 6 characters"></div>
+            <div class="form-group"><label>Confirm New Password</label><input type="password" id="confPass" placeholder="Repeat password"></div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-primary btn-sm" onclick="saveAllSettings()"><i class="fas fa-save"></i> Save All</button>
+            <button class="btn btn-outline btn-sm" onclick="lockSettings()"><i class="fas fa-lock"></i> Lock</button>
+          </div>
+        </div>
+      </div>
+      <!-- Categories -->
+      <div class="section-card">
+        <h4><i class="fas fa-tags" style="color:var(--primary)"></i> Hardware Categories</h4>
+        <div class="chip-wrap" id="categoriesList"></div>
+        <button class="btn btn-primary btn-sm" onclick="openModal('addCategoryModal')"><i class="fas fa-plus"></i> Add Category</button>
+      </div>
+      <!-- Units -->
+      <div class="section-card">
+        <h4><i class="fas fa-ruler" style="color:var(--info)"></i> Units of Measure</h4>
+        <div class="chip-wrap" id="unitsList"></div>
+        <button class="btn btn-primary btn-sm" onclick="openModal('addUnitModal')"><i class="fas fa-plus"></i> Add Unit</button>
+      </div>
+      <!-- Danger Zone -->
+      <div class="danger-zone">
+        <h4><i class="fas fa-exclamation-triangle"></i> Danger Zone — Reset All Data</h4>
+        <p>This will permanently delete ALL stock, sales, expenses, credits, and supplier records. A full JSON backup is downloaded automatically before the reset.</p>
+        <button class="btn btn-danger btn-sm" onclick="confirmFullReset()"><i class="fas fa-trash-alt"></i> Reset System &amp; Clear All Data</button>
+      </div>
+    </div>
+
+  </div><!-- end content -->
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <div class="nav-item active" onclick="showPage('dashboard',this)"><i class="fas fa-home"></i><span>Home</span></div>
+    <div class="nav-item" onclick="showPage('allstock',this)"><i class="fas fa-boxes"></i><span>Stock</span></div>
+    <div class="nav-item" onclick="showPage('sales',this)"><i class="fas fa-cash-register"></i><span>Sales</span></div>
+    <div class="nav-item" onclick="showPage('expenses',this)"><i class="fas fa-receipt"></i><span>Expenses</span></div>
+    <div class="nav-item" onclick="showPage('credits',this)"><i class="fas fa-file-invoice-dollar"></i><span>Credits</span></div>
+    <div class="nav-item" onclick="showPage('suppliers',this)"><i class="fas fa-truck"></i><span>Suppliers</span></div>
+    <div class="nav-item" onclick="showPage('reports',this)"><i class="fas fa-chart-bar"></i><span>Reports</span></div>
+    <div class="nav-item" onclick="showPage('guide',this)"><i class="fas fa-book-open"></i><span>Guide</span></div>
+    <div class="nav-item" onclick="showPage('settings',this)"><i class="fas fa-cog"></i><span>Settings</span></div>
+  </div>
+</div>
+
+<!-- ===== MODALS ===== -->
+
+<!-- ADD ITEM -->
+<div id="addItemModal" class="modal"><div class="modal-content">
+  <h2><i class="fas fa-plus-circle" style="color:var(--primary)"></i> Add New Item</h2>
+  <div class="form-group"><label>Item Name *</label><input type="text" id="iName" placeholder="e.g. Galvanised Pipe 1 inch"></div>
+  <div class="form-row">
+    <div class="form-group"><label>Category</label><input type="text" id="iCat" list="catSugg" placeholder="e.g. Plumbing"><datalist id="catSugg"></datalist></div>
+    <div class="form-group"><label>Unit</label><select id="iUnit"><option>pcs</option></select></div>
+  </div>
+  <div class="form-group"><label>Supplier</label><select id="iSupplier"><option value="">No Supplier</option></select></div>
+  <div class="form-row">
+    <div class="form-group"><label>Quantity</label><input type="number" id="iQty" value="0" min="0"></div>
+    <div class="form-group"><label>Min Stock Alert</label><input type="number" id="iMin" value="5" min="0"></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Buy Price (KES)</label><input type="number" id="iBuy" placeholder="0"></div>
+    <div class="form-group"><label>Sell Price (KES)</label><input type="number" id="iSell" placeholder="0"></div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-outline" onclick="closeModal('addItemModal')">Cancel</button>
+    <button class="btn btn-primary" onclick="addItem()"><i class="fas fa-save"></i> Save</button>
+  </div>
+</div></div>
+
+<!-- STOCK IN -->
+<div id="stockInModal" class="modal"><div class="modal-content">
+  <h2><i class="fas fa-arrow-down" style="color:var(--success)"></i> Stock In</h2>
+  <div class="form-group"><label>Select Item *</label><select id="stockInItem"></select></div>
+  <div class="form-row">
+    <div class="form-group"><label>Qty to Add</label><input type="number" id="stockInQty" value="1" min="1"></div>
+    <div class="form-group"><label>Update Buy Price</label><input type="number" id="stockInBuy" placeholder="optional"></div>
+  </div>
+  <div class="form-group"><label>Update Sell Price</label><input type="number" id="stockInSell" placeholder="optional"></div>
+  <div class="form-group"><label>Supplier (optional)</label><select id="stockInSupplier"><option value="">No Change</option></select></div>
+  <div class="modal-footer">
+    <button class="btn btn-outline" onclick="closeModal('stockInModal')">Cancel</button>
+    <button class="btn btn-success" onclick="processStockIn()"><i class="fas fa-check"></i> Add Stock</button>
+  </div>
+</div></div>
+
+<!-- NEW SALE -->
+<div id="saleModal" class="modal"><div class="modal-content">
+  <h2><i class="fas fa-cash-register" style="color:var(--primary)"></i> New Sale</h2>
+  <div class="form-row">
+    <div class="form-group"><label>Customer Name *</label><input type="text" id="saleCustomer" placeholder="Full name"></div>
+    <div class="form-group"><label>Phone</label><input type="tel" id="salePhone" placeholder="07xx xxx xxx"></div>
+  </div>
+  <div class="form-group"><label>Select Item *</label><select id="salePart" onchange="updateSalePrice()"></select></div>
+  <div class="form-row">
+    <div class="form-group"><label>Quantity</label><input type="number" id="saleQty" value="1" min="1" oninput="calcTotal()"></div>
+    <div class="form-group"><label>Unit Price (KES)</label><input type="number" id="salePrice" oninput="calcTotal()"></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Total (KES)</label><input type="text" id="saleTotal" readonly style="font-weight:800;color:var(--primary);"></div>
+    <div class="form-group"><label>Amount Paid (KES)</label><input type="number" id="salePaid" value="0" min="0" oninput="calcBalance()"></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Balance (KES)</label><input type="text" id="saleBalance" readonly style="font-weight:800;color:var(--danger);"></div>
+    <div class="form-group"><label>Payment Method</label><select id="saleMethod"><option>Cash</option><option>M-Pesa</option><option>Credit</option><option>Bank Transfer</option></select></div>
+  </div>
+  <div class="form-group"><label>Sale Date</label><input type="date" id="saleDate"></div>
+  <div class="modal-footer">
+    <button class="btn btn-outline" onclick="closeModal('saleModal')">Cancel</button>
+    <button class="btn btn-primary" onclick="createSale()"><i class="fas fa-check"></i> Complete Sale</button>
+  </div>
+</div></div>
+
+<!-- EDIT SALE -->
+<div id="editSaleModal" class="modal"><div class="modal-content">
+  <h2><i class="fas fa-edit" style="color:var(--warning)"></i> Edit Sale</h2>
+  <p style="font-size:11px;color:var(--text2);margin-bottom:12px;background:var(--surface2);padding:8px 10px;border-radius:8px;">ℹ️ Edit customer, date, payment only. Delete &amp; re-record to change item/qty.</p>
+  <div class="form-row">
+    <div class="form-group"><label>Customer Name *</label><input type="text" id="editSaleCustomer"></div>
+    <div class="form-group"><label>Phone</label><input type="tel" id="editSalePhone"></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Sale Date</label><input type="date" id="editSaleDate"></div>
+    <div class="form-group"><label>Payment Method</label><select id="editSaleMethod"><option>Cash</option><option>M-Pesa</option><option>Credit</option><option>Bank Transfer</option></select></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Total (KES)</label><input type="text" id="editSaleTotal" readonly style="font-weight:800;color:var(--primary);background:var(--surface2);"></div>
+    <div class="form-group"><label>Amount Paid (KES)</label><input type="number" id="editSalePaid" min="0" oninput="calcEditBalance()"></div>
+  </div>
+  <div class="form-group"><label>Balance (KES)</label><input type="text" id="editSaleBalance" readonly style="font-weight:800;color:var(--danger);background:var(--surface2);"></div>
+  <div class="modal-footer">
+    <button class="btn btn-outline" onclick="closeModal('editSaleModal')">Cancel</button>
+    <button class="btn btn-warning" onclick="saveEditSale()"><i class="fas fa-save"></i> Save &amp; Receipt</button>
+  </div>
+</div></div>
+
+<!-- EXPENSE -->
+<div id="expenseModal" class="modal"><div class="modal-content">
+  <h2><i class="fas fa-receipt" style="color:var(--danger)"></i> Add Expense</h2>
+  <div class="form-row">
+    <div class="form-group"><label>Category</label>
+      <select id="expenseCat"><option>Rent</option><option>Salaries</option><option>Electricity</option><option>Transport</option><option>Stock Purchase</option><option>Water</option><option>Other</option></select>
+    </div>
+    <div class="form-group"><label>Date</label><input type="date" id="expenseDate"></div>
+  </div>
+  <div class="form-group"><label>Amount (KES) *</label><input type="number" id="expenseAmount" placeholder="0"></div>
+  <div class="form-group"><label>Description</label><input type="text" id="expenseDesc" placeholder="Brief description"></div>
+  <div class="modal-footer">
+    <button class="btn btn-outline" onclick="closeModal('expenseModal')">Cancel</button>
+    <button class="btn btn-danger" onclick="addExpense()"><i class="fas fa-save"></i> Save</button>
+  </div>
+</div></div>
+
+<!-- ADD SUPPLIER -->
+<div id="addSupplierModal" class="modal"><div class="modal-content">
+  <h2><i class="fas fa-truck" style="color:var(--success)"></i> Add Supplier</h2>
+  <div class="form-group"><label>Supplier Name *</label><input type="text" id="supName" placeholder="e.g. Nairobi Hardware Supplies Ltd"></div>
+  <div class="form-group"><label>Phone Number</label><input type="tel" id="supPhone" placeholder="07xx xxx xxx"></div>
+  <div class="form-group"><label>Email (optional)</label><input type="email" id="supEmail" placeholder="supplier@email.com"></div>
+  <div class="form-group"><label>Location / Town</label><input type="text" id="supLocation" placeholder="e.g. Industrial Area, Nairobi"></div>
+  <div class="form-group"><label>Categories Supplied</label><input type="text" id="supCats" placeholder="e.g. Plumbing, Roofing, Electrical"></div>
+  <div class="form-group"><label>Notes</label><textarea id="supNotes" placeholder="Payment terms, delivery info, etc."></textarea></div>
+  <div class="modal-footer">
+    <button class="btn btn-outline" onclick="closeModal('addSupplierModal')">Cancel</button>
+    <button class="btn btn-success" onclick="addSupplier()"><i class="fas fa-save"></i> Save Supplier</button>
+  </div>
+</div></div>
+
+<!-- ADD CATEGORY -->
+<div id="addCategoryModal" class="modal"><div class="modal-content">
+  <h2><i class="fas fa-tags"></i> Add Category</h2>
+  <div class="form-group"><label>Category Name</label><input type="text" id="newCatName" placeholder="e.g. Roofing Materials"></div>
+  <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('addCategoryModal')">Cancel</button><button class="btn btn-primary" onclick="addCategory()">Add</button></div>
+</div></div>
+
+<!-- ADD UNIT -->
+<div id="addUnitModal" class="modal"><div class="modal-content">
+  <h2><i class="fas fa-ruler"></i> Add Unit of Measure</h2>
+  <div class="form-group"><label>Unit Name</label><input type="text" id="newUnitName" placeholder="e.g. rolls, bags, metres"></div>
+  <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('addUnitModal')">Cancel</button><button class="btn btn-primary" onclick="addUnit()">Add</button></div>
+</div></div>
+
+<!-- RECEIPT SHARE -->
+<div id="receiptShareModal" class="modal"><div class="modal-content" style="max-width:440px;">
+  <h2><i class="fas fa-receipt" style="color:var(--primary)"></i> Receipt — <span id="rsModalId" style="color:var(--primary)"></span></h2>
+  <div id="rsPreview" style="background:var(--surface2);border-radius:10px;padding:14px;font-family:'Courier New',monospace;font-size:11px;margin-bottom:14px;max-height:260px;overflow-y:auto;border:1px solid var(--border);white-space:pre-wrap;line-height:1.8;color:var(--text);"></div>
+  <p style="font-size:12px;color:var(--text2);margin-bottom:10px;">Send this receipt to your customer:</p>
+  <div style="display:flex;gap:7px;flex-wrap:wrap;">
+    <button class="btn btn-primary btn-sm" onclick="rsPrint()"><i class="fas fa-print"></i> Print</button>
+    <button class="btn btn-success btn-sm" onclick="rsDownload()"><i class="fas fa-download"></i> Save File</button>
+    <button class="btn btn-sm" style="background:#25d366;color:#fff;" onclick="rsWhatsApp()"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+    <button class="btn btn-outline btn-sm" onclick="rsCopy()"><i class="fas fa-copy"></i> Copy</button>
+  </div>
+  <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('receiptShareModal')">Close</button></div>
+</div></div>
+
+<script>
+// ===== STORAGE KEYS =====
+const SK={INV:'hw_inv',SALES:'hw_sales',EXP:'hw_exp',CATS:'hw_cats',UNITS:'hw_units',
+  SUPPLIERS:'hw_suppliers',THEME:'hw_theme',BIZ:'hw_biz',CREDS:'hw_creds',LOGO:'hw_logo'};
+
+// ===== DEFAULT DATA =====
+const DC=['Welding','Plumbing','Roofing','Electrical','Paint & Finishes','Tiles & Flooring','Timber & Boards','Nails & Fasteners','Pipes & Fittings','Hand Tools','Power Tools','Safety Gear','Cement & Aggregates','General Hardware'];
+const DU=['pcs','metres','kg','rolls','bags','litres','sheets','boxes','pairs','sets','lengths','bundles'];
+const DI=[
+  {id:1,name:'Welding Rods 3.2mm',category:'Welding',unit:'kg',supplier_id:null,qty:50,min_qty:10,buy_price:320,sell_price:480},
+  {id:2,name:'PVC Pipe 1/2 inch',category:'Plumbing',unit:'metres',supplier_id:null,qty:200,min_qty:30,buy_price:85,sell_price:130},
+  {id:3,name:'Iron Sheet 28 Gauge',category:'Roofing',unit:'sheets',supplier_id:null,qty:80,min_qty:15,buy_price:950,sell_price:1400},
+  {id:4,name:'Electrical Cable 2.5mm',category:'Electrical',unit:'metres',supplier_id:null,qty:300,min_qty:50,buy_price:55,sell_price:85},
+  {id:5,name:'Cement (Bamburi 50kg)',category:'Cement & Aggregates',unit:'bags',supplier_id:null,qty:120,min_qty:20,buy_price:680,sell_price:800},
+  {id:6,name:'Exterior Paint 4L',category:'Paint & Finishes',unit:'pcs',supplier_id:null,qty:30,min_qty:5,buy_price:1200,sell_price:1750},
+  {id:7,name:'Wire Nails 4 inch',category:'Nails & Fasteners',unit:'kg',supplier_id:null,qty:90,min_qty:15,buy_price:120,sell_price:180},
+  {id:8,name:'Safety Boots',category:'Safety Gear',unit:'pairs',supplier_id:null,qty:20,min_qty:3,buy_price:1500,sell_price:2200},
+];
+
+let inv=[],sales=[],expenses=[],cats=[],units=[],suppliers=[];
+let nid=9,nsid=1,neid=1,nsupid=1;
+let sc,tc,lr=null;
+let biz={name:'CLINTON HARDWARE',tagline:'Quality Hardware & Building Materials'};
+let creds={username:'Admin',password:'admin123'};
+let logoData=null;
+let _rsSale=null;
+let editSaleId=null;
+
+// ===== UTILS =====
+function la(k,d){try{let v=localStorage.getItem(k);if(v){let p=JSON.parse(v);if(Array.isArray(p))return p;}}catch(e){}localStorage.setItem(k,JSON.stringify(d));return[...d];}
+function lo(k,d){try{let v=localStorage.getItem(k);if(v)return JSON.parse(v);}catch(e){}return d;}
+function sv(k,v){localStorage.setItem(k,JSON.stringify(v));}
+function td(){return new Date().toISOString().split('T')[0];}
+function esc(s){if(!s)return'';return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+function fmt(n){return Number(n||0).toLocaleString();}
+function dl(c,t,n){let b=new Blob([c],{type:t});let u=URL.createObjectURL(b);let a=document.createElement('a');a.href=u;a.download=n;a.click();URL.revokeObjectURL(u);}
+
+// ===== INIT =====
+function initData(){
+  cats=la(SK.CATS,DC);units=la(SK.UNITS,DU);
+  inv=la(SK.INV,DI);sales=la(SK.SALES,[]);expenses=la(SK.EXP,[]);
+  suppliers=la(SK.SUPPLIERS,[]);
+  nid=inv.length?Math.max(...inv.map(p=>p.id))+1:1;
+  nsid=sales.length?Math.max(...sales.map(s=>parseInt(s.id.replace('HW-',''))||0))+1:1;
+  neid=expenses.length?Math.max(...expenses.map(e=>e.id||0))+1:1;
+  nsupid=suppliers.length?Math.max(...suppliers.map(s=>s.id||0))+1:1;
+  biz=lo(SK.BIZ,{name:'CLINTON HARDWARE',tagline:'Quality Hardware & Building Materials'});
+  creds=lo(SK.CREDS,{username:'Admin',password:'admin123'});
+  logoData=localStorage.getItem(SK.LOGO)||null;
+}
+
+// ===== THEME =====
+function initTheme(){
+  let t=localStorage.getItem(SK.THEME)||'light';
+  document.documentElement.setAttribute('data-theme',t);
+  document.getElementById('themeBtn').textContent=t==='dark'?'☀️':'🌙';
+}
+function toggleTheme(){
+  let c=document.documentElement.getAttribute('data-theme');
+  let n=c==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',n);
+  localStorage.setItem(SK.THEME,n);
+  document.getElementById('themeBtn').textContent=n==='dark'?'☀️':'🌙';
+  renderDashboard();
+}
+
+// ===== LOGO =====
+function handleLogoUpload(e){let f=e.target.files[0];if(!f)return;if(f.size>2097152){alert('❌ Max 2MB');return;}let r=new FileReader();r.onload=ev=>{logoData=ev.target.result;localStorage.setItem(SK.LOGO,logoData);applyLogo();};r.readAsDataURL(f);}
+function removeLogo(){logoData=null;localStorage.removeItem(SK.LOGO);applyLogo();}
+function handleLogoDrop(e){e.preventDefault();let f=e.dataTransfer.files[0];if(!f||!f.type.startsWith('image/')){alert('Drop an image');return;}if(f.size>2097152){alert('Max 2MB');return;}let r=new FileReader();r.onload=ev=>{logoData=ev.target.result;localStorage.setItem(SK.LOGO,logoData);applyLogo();alert('✅ Logo uploaded!');};r.readAsDataURL(f);}
+function applyLogo(){
+  let lw=document.getElementById('loginLogoWrap');
+  if(logoData){lw.innerHTML=`<img src="${logoData}" style="width:76px;height:76px;border-radius:14px;object-fit:cover;border:3px solid var(--primary);margin:0 auto 14px;display:block;">`;}
+  else{lw.innerHTML=`<div class="login-icon">🔩</div>`;}
+  let hw=document.getElementById('headerLogoWrap');
+  if(logoData){hw.innerHTML=`<img src="${logoData}" style="width:34px;height:34px;border-radius:8px;object-fit:cover;border:2px solid var(--primary);">`;}
+  else{hw.innerHTML=`<div class="header-icon">🔩</div>`;}
+  let pi=document.getElementById('logoPreviewImg'),pp=document.getElementById('logoPreviewPlaceholder'),rb=document.getElementById('removeLogoBtn');
+  if(pi&&pp&&rb){if(logoData){pi.src=logoData;pi.style.display='block';pp.style.display='none';rb.style.display='inline-flex';}else{pi.style.display='none';pp.style.display='block';rb.style.display='none';}}
+}
+function applyBizInfo(){
+  document.getElementById('loginBizName').textContent=biz.name||'CLINTON HARDWARE';
+  document.getElementById('loginBizTagline').textContent=biz.tagline||'Hardware Management System';
+  document.getElementById('headerBizName').textContent=biz.name||'CLINTON HARDWARE';
+  document.getElementById('headerBizTagline').textContent=biz.tagline||'Management System';
+  document.title=`${biz.name||'CLINTON HARDWARE'} | Management`;
+}
+
+// ===== CLOCK =====
+function startClock(){
+  function tick(){
+    let now=new Date(),days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    let h=String(now.getHours()).padStart(2,'0'),m=String(now.getMinutes()).padStart(2,'0'),s=String(now.getSeconds()).padStart(2,'0');
+    let cl=document.getElementById('hwClock'),dy=document.getElementById('hwDay');
+    if(cl)cl.textContent=`${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}  ${h}:${m}:${s}`;
+    if(dy)dy.textContent=days[now.getDay()];
+  }
+  tick();setInterval(tick,1000);
+}
+
+// ===== SETTINGS =====
+function unlockSettings(){
+  let pass=document.getElementById('settingsUnlockPass').value;
+  let err=document.getElementById('settingsLockError');
+  if(pass!==creds.password){err.textContent='❌ Wrong password!';return;}
+  err.textContent='';document.getElementById('settingsUnlockPass').value='';
+  document.getElementById('settingsLockPanel').style.display='none';
+  document.getElementById('settingsEditPanel').style.display='block';
+  document.getElementById('setBizName').value=biz.name||'';
+  document.getElementById('setBizTagline').value=biz.tagline||'';
+  let cd=document.getElementById('currentCredDisplay');if(cd)cd.textContent=creds.username;
+  applyLogo();
+}
+function lockSettings(){
+  document.getElementById('settingsLockPanel').style.display='block';
+  document.getElementById('settingsEditPanel').style.display='none';
+  ['newUser','newPass','confPass'].forEach(id=>{let e=document.getElementById(id);if(e)e.value='';});
+}
+function saveAllSettings(){
+  let n=document.getElementById('setBizName').value.trim();
+  let t=document.getElementById('setBizTagline').value.trim();
+  if(!n){alert('Enter business name');return;}
+  biz={name:n,tagline:t};sv(SK.BIZ,biz);applyBizInfo();
+  let nu=document.getElementById('newUser').value.trim();
+  let np=document.getElementById('newPass').value;
+  let cp=document.getElementById('confPass').value;
+  if(nu||np){
+    if(!nu){alert('Enter new username or leave both blank');return;}
+    if(np&&np.length<6){alert('Password must be at least 6 characters');return;}
+    if(np&&np!==cp){alert('❌ Passwords do not match!');return;}
+    creds={username:nu||creds.username,password:np||creds.password};
+    sv(SK.CREDS,creds);
+    document.getElementById('currentUser').textContent=creds.username;
+  }
+  lockSettings();alert('✅ All settings saved!');
+}
+
+// ===== LOGIN =====
+function handleLogin(){
+  let u=document.getElementById('loginUsername').value.trim();
+  let p=document.getElementById('loginPassword').value;
+  if(u===creds.username&&p===creds.password){
+    document.getElementById('loginPage').style.display='none';
+    document.getElementById('appContainer').style.display='block';
+    document.getElementById('currentUser').textContent=u;
+    initData();loadAllData();applyLogo();applyBizInfo();
+  } else {
+    document.getElementById('loginError').textContent='❌ Invalid username or password';
+  }
+}
+function logout(){
+  document.getElementById('loginPage').style.display='flex';
+  document.getElementById('appContainer').style.display='none';
+  document.getElementById('loginUsername').value='';
+  document.getElementById('loginPassword').value='';
+  document.getElementById('loginError').textContent='';
+}
+
+// ===== CRUD =====
+function addItem(){
+  let name=document.getElementById('iName').value.trim();if(!name){alert('Enter item name');return;}
+  let cat=document.getElementById('iCat').value.trim()||'General Hardware';
+  let unit=document.getElementById('iUnit').value;
+  let supId=document.getElementById('iSupplier').value;
+  if(!cats.includes(cat)){cats.push(cat);sv(SK.CATS,cats);}
+  let p={id:nid++,name,category:cat,unit,
+    supplier_id:supId?parseInt(supId):null,
+    qty:parseInt(document.getElementById('iQty').value)||0,
+    min_qty:parseInt(document.getElementById('iMin').value)||5,
+    buy_price:parseFloat(document.getElementById('iBuy').value)||0,
+    sell_price:parseFloat(document.getElementById('iSell').value)||0};
+  inv.push(p);sv(SK.INV,inv);loadAllData();closeModal('addItemModal');
+  ['iName','iCat'].forEach(id=>{let e=document.getElementById(id);if(e)e.value='';});
+  alert('✅ Item added!');
+}
+
+function processStockIn(){
+  let id=parseInt(document.getElementById('stockInItem').value);
+  let p=inv.find(x=>x.id===id);if(!p){alert('Select an item');return;}
+  p.qty+=parseInt(document.getElementById('stockInQty').value)||1;
+  let nb=document.getElementById('stockInBuy').value,ns=document.getElementById('stockInSell').value;
+  if(nb)p.buy_price=parseFloat(nb);if(ns)p.sell_price=parseFloat(ns);
+  let supId=document.getElementById('stockInSupplier').value;
+  if(supId)p.supplier_id=parseInt(supId);
+  sv(SK.INV,inv);loadAllData();closeModal('stockInModal');
+  alert(`✅ Stock updated! ${p.name}: ${p.qty} ${p.unit}`);
+}
+
+function createSale(){
+  let customer=document.getElementById('saleCustomer').value.trim();if(!customer){alert('Enter customer name');return;}
+  let pid=parseInt(document.getElementById('salePart').value);
+  let part=inv.find(p=>p.id===pid);if(!part){alert('Select an item');return;}
+  let qty=parseFloat(document.getElementById('saleQty').value)||1;
+  let price=parseFloat(document.getElementById('salePrice').value)||0;
+  if(price<=0){alert('Enter a valid price');return;}
+  if(part.qty<qty){alert(`❌ Only ${part.qty} ${part.unit} in stock!`);return;}
+  let total=qty*price,paid=parseFloat(document.getElementById('salePaid').value)||0;
+  let balance=Math.max(0,total-paid);
+  let status=balance===0?'Paid':(paid>0?'Partial':'Pending');
+  let sale={id:'HW-'+String(nsid++).padStart(4,'0'),
+    date:document.getElementById('saleDate').value||td(),
+    customer,phone:document.getElementById('salePhone').value.trim(),
+    items:[{name:part.name,category:part.category,unit:part.unit,qty,price,buy_price:part.buy_price}],
+    total,paid,balance,payment_method:document.getElementById('saleMethod').value,status};
+  part.qty-=qty;sv(SK.INV,inv);sales.unshift(sale);sv(SK.SALES,sales);
+  loadAllData();closeModal('saleModal');
+  setTimeout(()=>openReceiptShare(sale.id),300);
+  alert(balance>0?`✅ Sale recorded!\nBalance: KES ${fmt(balance)}`:'✅ Sale complete!');
+}
+
+function addExpense(){
+  let amount=parseFloat(document.getElementById('expenseAmount').value);
+  if(!amount||amount<=0){alert('Enter valid amount');return;}
+  let e={id:neid++,date:document.getElementById('expenseDate').value||td(),
+    category:document.getElementById('expenseCat').value,amount,
+    description:document.getElementById('expenseDesc').value.trim()};
+  expenses.unshift(e);sv(SK.EXP,expenses);loadAllData();closeModal('expenseModal');
+  document.getElementById('expenseAmount').value='';document.getElementById('expenseDesc').value='';
+  alert('✅ Expense recorded!');
+}
+
+function addSupplier(){
+  let name=document.getElementById('supName').value.trim();if(!name){alert('Enter supplier name');return;}
+  let sup={id:nsupid++,name,
+    phone:document.getElementById('supPhone').value.trim(),
+    email:document.getElementById('supEmail').value.trim(),
+    location:document.getElementById('supLocation').value.trim(),
+    categories:document.getElementById('supCats').value.trim(),
+    notes:document.getElementById('supNotes').value.trim()};
+  suppliers.push(sup);sv(SK.SUPPLIERS,suppliers);loadAllData();closeModal('addSupplierModal');
+  ['supName','supPhone','supEmail','supLocation','supCats','supNotes'].forEach(id=>{let e=document.getElementById(id);if(e)e.value='';});
+  alert('✅ Supplier added!');
+}
+
+function addCategory(){let n=document.getElementById('newCatName').value.trim();if(!n){alert('Enter name');return;}if(cats.includes(n)){alert('Already exists!');return;}cats.push(n);sv(SK.CATS,cats);loadAllData();closeModal('addCategoryModal');document.getElementById('newCatName').value='';}
+function addUnit(){let n=document.getElementById('newUnitName').value.trim();if(!n){alert('Enter unit');return;}if(units.includes(n)){alert('Already exists!');return;}units.push(n);sv(SK.UNITS,units);loadAllData();closeModal('addUnitModal');document.getElementById('newUnitName').value='';}
+
+function delItem(id){let p=inv.find(x=>x.id===id);if(!p||!confirm(`Delete "${p.name}"?`))return;inv=inv.filter(x=>x.id!==id);sv(SK.INV,inv);loadAllData();}
+function delSale(id){
+  let s=sales.find(x=>x.id===id);if(!s)return;
+  if(!confirm(`Delete receipt ${s.id} for ${s.customer}?\n\n⚠️ Stock will be RESTORED.`))return;
+  s.items.forEach(item=>{let part=inv.find(p=>p.name===item.name);if(part)part.qty+=item.qty;});
+  sv(SK.INV,inv);sales=sales.filter(x=>x.id!==id);sv(SK.SALES,sales);
+  loadAllData();alert(`✅ Sale deleted. Stock restored.`);
+}
+function delExp(id){if(!confirm('Delete this expense?'))return;expenses=expenses.filter(x=>x.id!==id);sv(SK.EXP,expenses);loadAllData();}
+function delSupplier(id){if(!confirm('Delete this supplier?'))return;suppliers=suppliers.filter(x=>x.id!==id);sv(SK.SUPPLIERS,suppliers);loadAllData();}
+function delCat(c){if(!confirm(`Delete "${c}"?`))return;cats=cats.filter(x=>x!==c);inv.forEach(p=>{if(p.category===c)p.category='General Hardware';});sv(SK.CATS,cats);sv(SK.INV,inv);loadAllData();}
+function delUnit(u){if(!confirm(`Delete unit "${u}"?`))return;units=units.filter(x=>x!==u);sv(SK.UNITS,units);loadAllData();}
+
+function recPay(id){
+  let s=sales.find(x=>x.id===id);if(!s)return;
+  let amt=prompt(`Payment for ${s.customer}\nBalance: KES ${fmt(s.balance)}\n\nAmount paid:`);
+  if(!amt||isNaN(amt)||parseFloat(amt)<=0)return;
+  s.paid+=parseFloat(amt);s.balance=Math.max(0,s.total-s.paid);
+  s.status=s.balance===0?'Paid':'Partial';sv(SK.SALES,sales);loadAllData();
+  alert(s.balance===0?`✅ ${s.customer} fully paid!`:`✅ Saved. Remaining: KES ${fmt(s.balance)}`);
+}
+
+// ===== EDIT SALE =====
+function openEditSale(id){
+  let s=sales.find(x=>x.id===id);if(!s)return;
+  editSaleId=id;
+  document.getElementById('editSaleCustomer').value=s.customer||'';
+  document.getElementById('editSalePhone').value=s.phone||'';
+  document.getElementById('editSaleDate').value=s.date||td();
+  document.getElementById('editSalePaid').value=s.paid||0;
+  document.getElementById('editSaleMethod').value=s.payment_method||'Cash';
+  document.getElementById('editSaleTotal').value=fmt(s.total);
+  calcEditBalance();openModal('editSaleModal');
+}
+function calcEditBalance(){
+  let t=parseFloat((document.getElementById('editSaleTotal').value||'0').replace(/,/g,''))||0;
+  let p=parseFloat(document.getElementById('editSalePaid').value)||0;
+  document.getElementById('editSaleBalance').value=Math.max(0,t-p).toLocaleString();
+}
+function saveEditSale(){
+  let s=sales.find(x=>x.id===editSaleId);if(!s)return;
+  let customer=document.getElementById('editSaleCustomer').value.trim();
+  if(!customer){alert('Enter customer name');return;}
+  let newPaid=parseFloat(document.getElementById('editSalePaid').value)||0;
+  if(newPaid<0){alert('Cannot be negative');return;}
+  if(newPaid>s.total){alert('Paid amount cannot exceed total');return;}
+  s.customer=customer;s.phone=document.getElementById('editSalePhone').value.trim();
+  s.date=document.getElementById('editSaleDate').value||td();
+  s.paid=newPaid;s.balance=Math.max(0,s.total-newPaid);
+  s.payment_method=document.getElementById('editSaleMethod').value;
+  s.status=s.balance===0?'Paid':(s.paid>0?'Partial':'Pending');
+  sv(SK.SALES,sales);loadAllData();closeModal('editSaleModal');
+  alert('✅ Sale updated!');
+  setTimeout(()=>openReceiptShare(s.id),300);
+}
+
+// ===== SALE CALC =====
+function updateSalePrice(){let id=parseInt(document.getElementById('salePart').value);let p=inv.find(x=>x.id===id);if(p){document.getElementById('salePrice').value=p.sell_price;calcTotal();}}
+function calcTotal(){let q=parseFloat(document.getElementById('saleQty').value)||0;let p=parseFloat(document.getElementById('salePrice').value)||0;document.getElementById('saleTotal').value=(q*p).toLocaleString();calcBalance();}
+function calcBalance(){let t=parseFloat((document.getElementById('saleTotal').value||'0').replace(/,/g,''))||0;let p=parseFloat(document.getElementById('salePaid').value)||0;document.getElementById('saleBalance').value=Math.max(0,t-p).toLocaleString();}
+
+// ===== BACKUP & RESTORE =====
+function exportData(){
+  let bk={date:new Date().toISOString(),version:'1.0',system:'CLINTON_HARDWARE',inventory:inv,sales,expenses,categories:cats,units,suppliers,biz,creds};
+  dl(JSON.stringify(bk,null,2),'application/json',`${biz.name}_backup_${td()}.json`);alert('✅ Backup exported!');
+}
+function importData(){
+  let inp=document.createElement('input');inp.type='file';inp.accept='application/json';
+  inp.onchange=e=>{let f=e.target.files[0];let r=new FileReader();r.onload=ev=>{try{
+    let d=JSON.parse(ev.target.result);
+    if(!d.inventory&&!d.sales){alert('❌ Invalid backup file');return;}
+    if(!confirm('This will REPLACE all current data. Continue?'))return;
+    if(d.inventory)inv=d.inventory;if(d.sales)sales=d.sales;if(d.expenses)expenses=d.expenses;
+    if(d.categories)cats=d.categories;if(d.units)units=d.units;if(d.suppliers)suppliers=d.suppliers;
+    if(d.biz)biz=d.biz;if(d.creds)creds=d.creds;
+    nid=inv.length?Math.max(...inv.map(p=>p.id))+1:1;
+    sv(SK.INV,inv);sv(SK.SALES,sales);sv(SK.EXP,expenses);sv(SK.CATS,cats);sv(SK.UNITS,units);sv(SK.SUPPLIERS,suppliers);sv(SK.BIZ,biz);sv(SK.CREDS,creds);
+    loadAllData();applyBizInfo();
+    alert(`✅ Imported!\n• ${inv.length} items\n• ${sales.length} sales\n• ${suppliers.length} suppliers`);
+  }catch(e){alert('❌ Invalid backup file!');}};r.readAsText(f);};inp.click();
+}
+
+// ===== RESET =====
+function confirmFullReset(){
+  if(!confirm('⚠️ RESET ALL DATA\n\nThis will delete ALL items, sales, expenses and supplier records.\n\nA JSON backup will be downloaded FIRST.\n\nContinue?'))return;
+  if(!confirm(`Final confirmation:\n• ${inv.length} stock items\n• ${sales.length} sales\n• ${expenses.length} expenses\n• ${suppliers.length} suppliers\n\nAll will be deleted. This CANNOT be undone.\n\nClick OK to proceed.`))return;
+  exportData();
+  setTimeout(()=>{
+    inv=[];sales=[];expenses=[];suppliers=[];cats=[...DC];units=[...DU];nid=1;nsid=1;neid=1;nsupid=1;
+    sv(SK.INV,inv);sv(SK.SALES,sales);sv(SK.EXP,expenses);sv(SK.SUPPLIERS,suppliers);sv(SK.CATS,cats);sv(SK.UNITS,units);
+    loadAllData();alert('✅ System reset complete. All data cleared.\n\nBackup saved to Downloads folder.');
+  },600);
+}
+
+// ===== RECEIPT =====
+function buildReceiptText(s){
+  let sep='================================';
+  let lines=[sep,`  ${biz.name}`,`  ${biz.tagline}`,sep,
+    `RECEIPT: ${s.id}`,'Date:     '+s.date,'',
+    'Customer: '+s.customer,(s.phone?'Phone:    '+s.phone:''),
+    'Payment:  '+s.payment_method,'Status:   '+s.status,
+    '--------------------------------'];
+  s.items.forEach(i=>lines.push(`${i.name}`,`  ${i.qty} ${i.unit||'pcs'} x KES ${fmt(i.price)} = KES ${fmt(i.qty*i.price)}`));
+  lines.push('--------------------------------',
+    `TOTAL:    KES ${fmt(s.total)}`,`PAID:     KES ${fmt(s.paid)}`);
+  if(s.balance>0)lines.push(`BALANCE:  KES ${fmt(s.balance)}`);
+  lines.push(sep,'  Thank you for your business!',`  ${biz.name}`,sep);
+  return lines.filter(l=>l!=='').join('\n');
+}
+function openReceiptShare(sid){
+  let s=sales.find(x=>x.id===sid);if(!s)return;
+  _rsSale=s;
+  document.getElementById('rsModalId').textContent=s.id;
+  document.getElementById('rsPreview').textContent=buildReceiptText(s);
+  document.getElementById('receiptShareModal').style.display='flex';
+}
+function rsPrint(){
+  if(!_rsSale)return;
+  closeModal('receiptShareModal');
+  printReceipt(_rsSale.id);
+}
+function rsDownload(){
+  if(!_rsSale)return;
+  let s=_rsSale;
+  let logoHtml=logoData?`<img src="${logoData}" style="width:64px;height:64px;border-radius:10px;object-fit:cover;border:2px solid #f59e0b;margin-bottom:8px;">`:'<div style="font-size:36px;margin-bottom:8px;">🔩</div>';
+  let html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Receipt ${s.id}</title>
+  <style>body{font-family:'Courier New',monospace;background:#f0f0f0;display:flex;justify-content:center;padding:30px;}
+  .card{background:#fff;padding:28px 24px;border-radius:10px;max-width:360px;box-shadow:0 4px 20px rgba(0,0,0,.15);}
+  .hdr{text-align:center;padding-bottom:12px;border-bottom:1px dashed #ccc;margin-bottom:12px;}
+  .bname{font-size:15px;font-weight:900;color:#f59e0b;letter-spacing:2px;}
+  .btag{font-size:9px;color:#999;letter-spacing:1px;}
+  .row{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;}
+  .l{color:#666;}.r{font-weight:700;}
+  hr{border:none;border-top:1px dashed #ccc;margin:10px 0;}
+  .total{font-size:15px;font-weight:900;color:#f59e0b;}
+  .paid{color:#10b981;font-weight:700;}.bal{color:#ef4444;font-weight:700;}
+  .footer{text-align:center;padding-top:10px;border-top:1px dashed #ccc;margin-top:12px;font-size:11px;color:#999;}
+  @media print{body{background:#fff;padding:0;}.card{box-shadow:none;}.no-print{display:none;}}</style></head>
+  <body><div class="card">
+  <div class="hdr">${logoHtml}<div class="bname">${esc(biz.name)}</div><div class="btag">${esc(biz.tagline)}</div><div style="font-size:9px;font-weight:700;margin-top:6px;letter-spacing:3px;">OFFICIAL SALES RECEIPT</div></div>
+  <div class="row"><span class="l">Receipt No</span><span class="r" style="color:#f59e0b;">${esc(s.id)}</span></div>
+  <div class="row"><span class="l">Date</span><span class="r">${esc(s.date)}</span></div>
+  <div class="row"><span class="l">Customer</span><span class="r">${esc(s.customer)}</span></div>
+  ${s.phone?`<div class="row"><span class="l">Phone</span><span class="r">${esc(s.phone)}</span></div>`:''}
+  <div class="row"><span class="l">Payment</span><span class="r">${esc(s.payment_method)}</span></div>
+  <hr>
+  ${s.items.map(i=>`<div class="row"><span class="l">${esc(i.name)}<br><small style="color:#999;">${i.qty} ${i.unit||'pcs'} × KES ${fmt(i.price)}</small></span><span class="r">KES ${fmt(i.qty*i.price)}</span></div>`).join('')}
+  <hr>
+  <div class="row"><span class="l">TOTAL</span><span class="r total">KES ${fmt(s.total)}</span></div>
+  <div class="row"><span class="l">Paid</span><span class="r paid">KES ${fmt(s.paid)}</span></div>
+  ${s.balance>0?`<div class="row"><span class="l">Balance Due</span><span class="r bal">KES ${fmt(s.balance)}</span></div>`:''}
+  <div class="footer"><div style="font-size:14px;font-weight:900;color:#374151;margin-bottom:4px;">Thank You! 🙏</div><p>We value your business</p><p>${esc(biz.name)}</p></div>
+  <div class="no-print" style="text-align:center;margin-top:16px;"><button onclick="window.print()" style="padding:9px 22px;background:#f59e0b;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">🖨️ Print</button></div>
+  </div></body></html>`;
+  dl(html,'text/html','Receipt_'+s.id+'_'+s.customer.replace(/\s+/g,'_')+'.html');
+}
+function rsWhatsApp(){
+  if(!_rsSale)return;
+  let txt=buildReceiptText(_rsSale);
+  let phone=_rsSale.phone?_rsSale.phone.replace(/^0/,'254'):'';
+  let url=phone?'https://wa.me/'+phone+'?text='+encodeURIComponent(txt):'https://wa.me/?text='+encodeURIComponent(txt);
+  window.open(url,'_blank');
+}
+function rsCopy(){
+  if(!_rsSale)return;
+  let txt=buildReceiptText(_rsSale);
+  if(navigator.clipboard){navigator.clipboard.writeText(txt).then(()=>alert('✅ Copied! Paste in SMS or WhatsApp.'));}
+  else{let ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);alert('✅ Copied!');}
+}
+
+// ===== PRINT RECEIPT (styled popup) =====
+function printReceipt(sid){
+  let s=sales.find(x=>x.id===sid);if(!s)return;
+  if(!logoData){alert('⚠️ Upload your logo in Settings first.');showPage('settings',document.querySelector('.nav-item:last-child'));return;}
+  let w=window.open('','_blank','width=440,height=750');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Receipt ${s.id}</title>
+  <style>*{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#c8d6e5;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px;font-family:'Courier New',monospace;}
+  body::after{content:'Hardware\\AManagement';white-space:pre;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-35deg);font-size:28px;font-weight:900;color:rgba(245,158,11,.06);letter-spacing:2px;text-align:center;pointer-events:none;z-index:0;width:100%;line-height:1.4;}
+  .paper{background:#fff;width:320px;border-radius:4px;box-shadow:0 10px 40px rgba(0,0,0,.25);}
+  .tear{height:14px;background:repeating-linear-gradient(90deg,#c8d6e5 0,#c8d6e5 6px,#fff 6px,#fff 12px);border-bottom:1.5px dashed #94a3b8;}
+  .tear.btm{border-top:1.5px dashed #94a3b8;border-bottom:none;}
+  .body{padding:18px 20px;}
+  .biz-hdr{text-align:center;padding-bottom:12px;border-bottom:1px dashed #e2e8f0;margin-bottom:12px;}
+  .biz-logo{width:60px;height:60px;border-radius:10px;object-fit:cover;border:2px solid #f59e0b;margin-bottom:6px;}
+  .biz-name{font-size:16px;font-weight:900;letter-spacing:2px;color:#f59e0b;}
+  .biz-tag{font-size:8px;color:#9ca3af;letter-spacing:1px;}
+  .doc-title{font-size:9px;font-weight:700;margin-top:6px;letter-spacing:4px;color:#374151;}
+  .row{display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;}
+  .row .l{color:#6b7280;}.row .r{font-weight:700;color:#111;text-align:right;max-width:58%;word-break:break-word;}
+  hr{border:none;border-top:1px dashed #e2e8f0;margin:8px 0;}
+  .item{margin-bottom:8px;}
+  .item-top{display:flex;justify-content:space-between;font-size:11px;}
+  .item-name{font-weight:700;color:#111;flex:1;}
+  .item-sub{font-size:9px;color:#9ca3af;margin-top:1px;}
+  .item-price{font-weight:700;color:#111;}
+  .item-calc{font-size:9px;color:#6b7280;}
+  .trow{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;}
+  .trow .l{color:#4b5563;}.trow .r{font-weight:700;}
+  .trow.grand{border-top:1.5px solid #111;padding-top:6px;margin-top:3px;}
+  .trow.grand .l{font-size:13px;font-weight:900;color:#000;}
+  .trow.grand .r{font-size:13px;font-weight:900;color:#f59e0b;}
+  .trow.paid .r{color:#10b981;}.trow.bal .r{color:#ef4444;}
+  .badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:9px;font-weight:700;}
+  .b-Paid{background:#d1fae5;color:#065f46;}.b-Partial{background:#fed7aa;color:#9a3412;}.b-Pending{background:#fee2e2;color:#991b1b;}
+  .footer{text-align:center;padding-top:10px;border-top:1px dashed #e2e8f0;margin-top:10px;}
+  .thanks{font-size:13px;font-weight:900;color:#374151;margin-bottom:3px;}
+  .footer p{font-size:9px;color:#9ca3af;margin-bottom:2px;}
+  .barcode{font-size:26px;letter-spacing:5px;color:#374151;margin:6px 0 2px;}
+  .barcode-num{font-size:9px;color:#9ca3af;letter-spacing:3px;}
+  .actions{display:flex;gap:8px;justify-content:center;margin-top:14px;}
+  .actions button{padding:9px 18px;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;}
+  .bp{background:#f59e0b;color:#fff;}.bc{background:#6b7280;color:#fff;}
+  @media print{body{background:#fff;padding:0;}.paper{box-shadow:none;width:100%;}.tear{display:none;}.actions{display:none;}}
+  </style></head><body>
+  <div class="paper">
+    <div class="tear"></div>
+    <div class="body">
+      <div class="biz-hdr">
+        <img src="${logoData}" class="biz-logo">
+        <div class="biz-name">${esc(biz.name)}</div>
+        <div class="biz-tag">${esc(biz.tagline)}</div>
+        <div class="doc-title">— OFFICIAL SALES RECEIPT —</div>
+      </div>
+      <div class="row"><span class="l">Receipt No</span><span class="r" style="color:#f59e0b;font-weight:900">${esc(s.id)}</span></div>
+      <div class="row"><span class="l">Date</span><span class="r">${esc(s.date)}</span></div>
+      <div class="row"><span class="l">Customer</span><span class="r">${esc(s.customer)}</span></div>
+      ${s.phone?`<div class="row"><span class="l">Phone</span><span class="r">${esc(s.phone)}</span></div>`:''}
+      <div class="row"><span class="l">Payment</span><span class="r">${esc(s.payment_method)}</span></div>
+      <div class="row"><span class="l">Status</span><span class="r"><span class="badge b-${s.status}">${s.status}</span></span></div>
+      <hr>
+      ${s.items.map(i=>`<div class="item"><div class="item-top">
+        <div><div class="item-name">${esc(i.name)}</div><div class="item-sub">${esc(i.category||'')}${i.unit?' · '+i.unit:''}</div></div>
+        <div style="text-align:right;white-space:nowrap;margin-left:8px;"><div class="item-price">KES ${fmt(i.qty*i.price)}</div><div class="item-calc">${i.qty} ${i.unit||'pcs'} × KES ${fmt(i.price)}</div></div>
+      </div></div>`).join('')}
+      <div style="padding-top:8px;">
+        <div class="trow grand"><span class="l">TOTAL</span><span class="r">KES ${fmt(s.total)}</span></div>
+        <div class="trow paid"><span class="l">Amount Paid</span><span class="r">KES ${fmt(s.paid)}</span></div>
+        ${s.balance>0?`<div class="trow bal"><span class="l">Balance Due</span><span class="r">KES ${fmt(s.balance)}</span></div>`:''}
+      </div>
+      <div class="footer">
+        <div class="barcode">|||||||||||||||</div>
+        <div class="barcode-num">${s.id}</div>
+        <div class="thanks">Thank You! 🙏</div>
+        <p>Quality Hardware & Building Materials</p>
+      </div>
+    </div>
+    <div class="tear btm"></div>
+  </div>
+  <div class="actions">
+    <button class="bp" onclick="window.print()">🖨️ Print</button>
+    <button class="bc" onclick="window.close()">✖ Close</button>
+  </div>
+  <script>setTimeout(()=>window.print(),700);<\/script>
+  </body></html>`);w.document.close();
+}
+
+// ===== FINANCIAL CALCS =====
+function calcFinancials(fs,fe){
+  let revenue=fs.reduce((s,x)=>s+(x.paid||0),0);
+  let invoiced=fs.reduce((s,x)=>s+(x.total||0),0);
+  let outstanding=fs.reduce((s,x)=>s+(x.balance||0),0);
+  let cogs=fs.reduce((sum,sale)=>sum+sale.items.reduce((s,item)=>{
+    let part=inv.find(p=>p.name===item.name);return s+(item.buy_price?item.buy_price*item.qty:(part?part.buy_price*item.qty:0));},0),0);
+  let grossProfit=invoiced-cogs;
+  let totalExp=fe.reduce((s,x)=>s+(x.amount||0),0);
+  let netProfit=grossProfit-totalExp;
+  let stockValue=inv.reduce((s,p)=>s+(p.buy_price*p.qty),0);
+  let debtors=sales.reduce((s,x)=>s+(x.balance||0),0);
+  let totalAssets=stockValue+debtors;
+  return{trading:{revenue,invoiced,outstanding,cogs,grossProfit},pl:{grossProfit,expenses:totalExp,netProfit},bs:{stockValue,debtors,totalAssets,netProfit}};
+}
+
+// ===== GENERATE REPORT =====
+function toggleReportDate(){
+  let t=document.getElementById('reportType').value;
+  document.getElementById('dailyDate').style.display=t==='daily'?'inline-block':'none';
+  document.getElementById('monthlyDate').style.display=t==='monthly'?'inline-block':'none';
+  if(t==='daily')document.getElementById('dailyDate').value=td();
+  if(t==='monthly')document.getElementById('monthlyDate').value=td().slice(0,7);
+}
+function generateReport(){
+  let type=document.getElementById('reportType').value;
+  let lbl='',fs=[],fe=[];
+  if(type==='daily'){let d=document.getElementById('dailyDate').value;if(!d){alert('Select a date');return;}lbl=d;fs=sales.filter(s=>s.date===d);fe=expenses.filter(e=>e.date===d);}
+  else{let m=document.getElementById('monthlyDate').value;if(!m){alert('Select a month');return;}lbl=m;fs=sales.filter(s=>s.date&&s.date.startsWith(m));fe=expenses.filter(e=>e.date&&e.date.startsWith(m));}
+  let {trading,pl,bs}=calcFinancials(fs,fe);
+  lr={type,lbl,fs,fe,trading,pl,bs};
+  let cogsRows=fs.map(s=>{let c=s.items.reduce((sum,i)=>sum+(i.buy_price?i.buy_price*i.qty:0),0);return `<tr class="fin-indent"><td>${esc(s.customer)} — ${s.items.map(i=>`${i.qty}×${esc(i.name)}`).join(', ')}</td><td>KES ${fmt(c)}</td></tr>`;}).join('');
+  let expRows=fe.length>0?fe.map(e=>`<tr class="fin-indent"><td>${esc(e.date)} — ${esc(e.category)}${e.description?' ('+esc(e.description)+')':''}</td><td>KES ${fmt(e.amount)}</td></tr>`).join(''):'<tr class="fin-indent"><td style="color:var(--text2)">No expenses this period</td><td>KES 0</td></tr>';
+  document.getElementById('reportDisplay').innerHTML=`
+    <div style="text-align:center;margin-bottom:16px;padding-bottom:12px;border-bottom:3px solid var(--primary);">
+      ${logoData?`<img src="${logoData}" style="width:60px;height:60px;border-radius:10px;object-fit:cover;border:3px solid var(--primary);margin-bottom:8px;display:block;margin-left:auto;margin-right:auto;">`:''}
+      <div style="font-size:17px;font-weight:900;color:var(--primary);letter-spacing:1px;">${esc(biz.name)}</div>
+      <div style="font-size:11px;color:var(--text2);">${esc(biz.tagline)}</div>
+      <div style="font-size:13px;font-weight:800;margin-top:8px;color:var(--text);">FINANCIAL STATEMENTS</div>
+      <div style="font-size:11px;color:var(--text2);margin-top:2px;">Period: <strong>${lbl}</strong> · ${type==='daily'?'Daily':'Monthly'} Report</div>
+    </div>
+    <div class="fin-doc-title">Document 1 — Trading Account</div>
+    <div class="fin-subtitle">For the period ended: ${lbl}</div>
+    <table class="fin-table">
+      <tr><td style="font-weight:700">Sales Revenue</td><td></td></tr>
+      <tr class="fin-indent"><td>Total Invoiced</td><td>KES ${fmt(trading.invoiced)}</td></tr>
+      <tr class="fin-indent"><td style="color:var(--text2)">Cash Collected</td><td style="color:var(--success)">KES ${fmt(trading.revenue)}</td></tr>
+      <tr class="fin-indent"><td style="color:var(--text2)">Still Outstanding</td><td style="color:var(--danger)">KES ${fmt(trading.outstanding)}</td></tr>
+      <tr><td style="font-weight:700">Less: Cost of Goods Sold</td><td></td></tr>
+      ${cogsRows||'<tr class="fin-indent"><td style="color:var(--text2)">No sales this period</td><td>KES 0</td></tr>'}
+      <tr class="fin-indent fin-subtotal2"><td>Total COGS</td><td style="color:var(--danger)">(KES ${fmt(trading.cogs)})</td></tr>
+      <tr class="fin-total"><td>GROSS PROFIT</td><td class="${trading.grossProfit>=0?'positive':'negative'}">KES ${fmt(trading.grossProfit)}</td></tr>
+    </table>
+    <div class="fin-doc-title" style="margin-top:18px;">Document 2 — Profit &amp; Loss Account</div>
+    <div class="fin-subtitle">For the period ended: ${lbl}</div>
+    <table class="fin-table">
+      <tr><td style="font-weight:700">Gross Profit b/d</td><td>KES ${fmt(pl.grossProfit)}</td></tr>
+      <tr><td style="font-weight:700">Less: Operating Expenses</td><td></td></tr>
+      ${expRows}
+      <tr class="fin-indent fin-subtotal2"><td>Total Expenses</td><td style="color:var(--danger)">(KES ${fmt(pl.expenses)})</td></tr>
+      <tr class="fin-total"><td>NET ${pl.netProfit>=0?'PROFIT':'LOSS'}</td><td class="${pl.netProfit>=0?'positive':'negative'}">KES ${fmt(pl.netProfit)}</td></tr>
+    </table>
+    <div class="fin-doc-title" style="margin-top:18px;">Document 3 — Balance Sheet</div>
+    <div class="fin-subtitle">As at: ${lbl}</div>
+    <table class="fin-table">
+      <tr><td colspan="2" style="font-weight:800;color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:.5px;padding-top:6px;">ASSETS</td></tr>
+      <tr class="fin-indent"><td>Closing Stock — ${inv.length} items at cost</td><td>KES ${fmt(bs.stockValue)}</td></tr>
+      <tr class="fin-indent"><td>Trade Debtors — Credit owed to us</td><td>KES ${fmt(bs.debtors)}</td></tr>
+      <tr class="fin-subtotal"><td><strong>Total Assets</strong></td><td><strong>KES ${fmt(bs.totalAssets)}</strong></td></tr>
+      <tr><td colspan="2" style="font-weight:800;color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:.5px;padding-top:8px;">FINANCED BY (EQUITY)</td></tr>
+      <tr class="fin-indent"><td>Net ${bs.netProfit>=0?'Profit':'Loss'} for the period</td><td class="${bs.netProfit>=0?'positive':'negative'}">KES ${fmt(bs.netProfit)}</td></tr>
+      <tr class="fin-total"><td>TOTAL EQUITY</td><td class="${bs.netProfit>=0?'positive':'negative'}">KES ${fmt(bs.netProfit)}</td></tr>
+    </table>`;
+}
+
+function printReport(){
+  if(!lr){alert('Generate a report first');return;}
+  if(!logoData){alert('⚠️ Upload your logo in Settings first.');showPage('settings',document.querySelector('.nav-item:last-child'));return;}
+  let r=lr;
+  let cogsDetail=r.fs.map(s=>{let c=s.items.reduce((sum,i)=>sum+(i.buy_price?i.buy_price*i.qty:0),0);return `<tr class="indent"><td>${esc(s.customer)} — ${s.items.map(i=>`${i.qty}×${esc(i.name)}`).join(', ')}</td><td>KES ${fmt(c)}</td></tr>`;}).join('');
+  let expDetail=r.fe.length>0?r.fe.map(e=>`<tr class="indent"><td>${esc(e.date)} — ${esc(e.category)}${e.description?' ('+esc(e.description)+')':''}</td><td>KES ${fmt(e.amount)}</td></tr>`).join(''):'<tr class="indent"><td>No expenses recorded</td><td>KES 0</td></tr>';
+  let w=window.open('','_blank','width=820,height=1100');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${esc(biz.name)} — ${r.lbl}</title>
+  <style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:'Segoe UI',Arial,sans-serif;font-size:12px;color:#111;background:#fff;padding:32px;}
+  body::after{content:'Hardware\\AManagement';white-space:pre;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-35deg);font-size:28px;font-weight:900;color:rgba(245,158,11,.05);letter-spacing:2px;text-align:center;pointer-events:none;z-index:0;width:100%;line-height:1.4;}
+  .hdr{text-align:center;padding-bottom:14px;border-bottom:3px solid #f59e0b;margin-bottom:22px;}
+  .hdr img{width:70px;height:70px;border-radius:10px;object-fit:cover;border:3px solid #f59e0b;display:block;margin:0 auto 8px;}
+  .hdr h1{font-size:20px;color:#f59e0b;font-weight:900;letter-spacing:1px;}
+  .hdr .tagline{font-size:10px;color:#6b7280;}
+  .hdr .title{font-size:15px;font-weight:800;margin-top:8px;}
+  .hdr .period{font-size:11px;color:#6b7280;margin-top:3px;}
+  .doc-block{margin-bottom:26px;page-break-inside:avoid;}
+  .doc-title{font-size:12px;font-weight:900;color:#fff;background:#1e3a5f;padding:8px 14px;border-radius:6px 6px 0 0;}
+  .doc-sub{font-size:10px;color:#6b7280;padding:4px 14px 8px;background:#fff7ed;border:1px solid #fed7aa;border-top:none;}
+  table{width:100%;border-collapse:collapse;}
+  td{padding:7px 14px;border-bottom:1px solid #f3f4f6;font-size:12px;}td:last-child{text-align:right;}
+  .indent td:first-child{padding-left:28px;color:#6b7280;font-size:11px;}.indent td:last-child{font-size:11px;}
+  .subtotal2 td{font-weight:700;background:#fef3c7;border-top:1px solid #fcd34d;}
+  .subtotal td{font-weight:800;background:#f9fafb;border-top:1px solid #e5e7eb;}
+  .total-row{background:#1e3a5f;color:#fff!important;}
+  .total-row td{padding:10px 14px;font-size:13px;font-weight:900;border-bottom:none;color:#fff;}
+  .total-row td:last-child{font-size:14px;}
+  .pos{color:#10b981!important;}.neg{color:#ef4444!important;}
+  .shead{font-weight:800;color:#374151;font-size:10px;text-transform:uppercase;letter-spacing:.5px;padding-top:8px!important;background:#f8fafc;}
+  .sched-title{font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;margin:18px 0 6px;}
+  .sched-table thead tr{background:#f59e0b;color:#fff;}
+  .sched-table thead th{padding:7px 10px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.4px;}
+  .tag{padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700;}
+  .tag-paid{background:#d1fae5;color:#065f46;}.tag-partial{background:#fed7aa;color:#9a3412;}.tag-pending{background:#fee2e2;color:#991b1b;}
+  .footer{text-align:center;margin-top:24px;padding-top:10px;border-top:1px solid #e5e7eb;font-size:10px;color:#9ca3af;}
+  @media print{body{padding:18px;}.no-print{display:none;}}
+  </style></head><body>
+  <div class="hdr"><img src="${logoData}"><h1>${esc(biz.name)}</h1><div class="tagline">${esc(biz.tagline)}</div><div class="title">FINANCIAL STATEMENTS</div><div class="period">Period: ${r.lbl} &bull; ${r.type==='daily'?'Daily':'Monthly'} Report &bull; ${new Date().toLocaleString()}</div></div>
+  <div class="doc-block"><div class="doc-title">Document 1 — Trading Account</div><div class="doc-sub">For the period ended: ${r.lbl}</div>
+  <table><tr><td style="font-weight:700;padding-left:14px;">Sales Revenue (Invoiced)</td><td style="font-weight:700">KES ${fmt(r.trading.invoiced)}</td></tr>
+  <tr class="indent"><td>Cash / M-Pesa Collected</td><td style="color:#10b981">KES ${fmt(r.trading.revenue)}</td></tr>
+  <tr class="indent"><td>Outstanding (Debtors)</td><td style="color:#ef4444">KES ${fmt(r.trading.outstanding)}</td></tr>
+  <tr><td class="shead" colspan="2">LESS: COST OF GOODS SOLD</td></tr>
+  ${cogsDetail||'<tr class="indent"><td>No sales</td><td>KES 0</td></tr>'}
+  <tr class="subtotal2"><td style="padding-left:14px;">Total COGS</td><td style="color:#ef4444">(KES ${fmt(r.trading.cogs)})</td></tr>
+  <tr class="total-row"><td>GROSS PROFIT</td><td class="${r.trading.grossProfit>=0?'pos':'neg'}">KES ${fmt(r.trading.grossProfit)}</td></tr></table></div>
+  <div class="doc-block"><div class="doc-title">Document 2 — Profit &amp; Loss Account</div><div class="doc-sub">For the period ended: ${r.lbl}</div>
+  <table><tr><td style="font-weight:700;padding-left:14px;">Gross Profit b/d</td><td>KES ${fmt(r.pl.grossProfit)}</td></tr>
+  <tr><td class="shead" colspan="2">LESS: OPERATING EXPENSES</td></tr>
+  ${expDetail}
+  <tr class="subtotal2"><td style="padding-left:14px;">Total Expenses</td><td style="color:#ef4444">(KES ${fmt(r.pl.expenses)})</td></tr>
+  <tr class="total-row"><td>NET ${r.pl.netProfit>=0?'PROFIT':'LOSS'}</td><td class="${r.pl.netProfit>=0?'pos':'neg'}">KES ${fmt(r.pl.netProfit)}</td></tr></table></div>
+  <div class="doc-block"><div class="doc-title">Document 3 — Balance Sheet</div><div class="doc-sub">As at: ${r.lbl}</div>
+  <table><tr><td class="shead" colspan="2">ASSETS</td></tr>
+  <tr class="indent"><td>Closing Stock — ${inv.length} items at cost</td><td>KES ${fmt(r.bs.stockValue)}</td></tr>
+  <tr class="indent"><td>Trade Debtors</td><td>KES ${fmt(r.bs.debtors)}</td></tr>
+  <tr class="subtotal"><td style="padding-left:14px;font-weight:800">Total Assets</td><td style="font-weight:800">KES ${fmt(r.bs.totalAssets)}</td></tr>
+  <tr><td class="shead" colspan="2">FINANCED BY (EQUITY)</td></tr>
+  <tr class="indent"><td>Net ${r.bs.netProfit>=0?'Profit':'Loss'}</td><td class="${r.bs.netProfit>=0?'pos':'neg'}">KES ${fmt(r.bs.netProfit)}</td></tr>
+  <tr class="total-row"><td>TOTAL EQUITY</td><td class="${r.bs.netProfit>=0?'pos':'neg'}">KES ${fmt(r.bs.netProfit)}</td></tr></table></div>
+  <div class="sched-title">Sales Transactions (${r.fs.length})</div>
+  <table class="sched-table"><thead><tr><th>Date</th><th>Receipt</th><th>Customer</th><th>Invoiced</th><th>Collected</th><th>Balance</th><th>Status</th></tr></thead>
+  <tbody>${r.fs.map(s=>`<tr><td>${s.date}</td><td>${s.id}</td><td>${esc(s.customer)}</td><td>KES ${fmt(s.total)}</td><td>KES ${fmt(s.paid)}</td><td>${s.balance>0?`<b style="color:#ef4444">KES ${fmt(s.balance)}</b>`:'—'}</td><td><span class="tag tag-${(s.status||'pending').toLowerCase()}">${s.status}</span></td></tr>`).join('')||'<tr><td colspan="7" style="text-align:center;color:#9ca3af;">No sales this period</td></tr>'}</tbody></table>
+  <div class="footer">${esc(biz.name)} &bull; ${esc(biz.tagline)} &bull; Confidential Financial Statements &bull; ${new Date().toLocaleString()}</div>
+  <div class="no-print" style="text-align:center;margin-top:20px;display:flex;justify-content:center;gap:10px;">
+    <button onclick="window.print()" style="padding:11px 24px;background:#f59e0b;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">🖨️ Print</button>
+    <button onclick="window.close()" style="padding:11px 18px;background:#6b7280;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">✖ Close</button>
+  </div>
+  <script>setTimeout(()=>window.print(),700);<\/script>
+  </body></html>`);w.document.close();
+}
+
+function exportCurrentReport(){
+  if(!lr){alert('Generate a report first');return;}
+  let r=lr;
+  let txt=`${biz.name} — ${r.type.toUpperCase()} FINANCIAL REPORT\nPeriod: ${r.lbl}\nGenerated: ${new Date().toLocaleString()}\n\n`;
+  txt+=`TRADING ACCOUNT\n${'─'.repeat(35)}\nSales Invoiced: KES ${fmt(r.trading.invoiced)}\nCash Collected: KES ${fmt(r.trading.revenue)}\nOutstanding:    KES ${fmt(r.trading.outstanding)}\nCOGS:           KES ${fmt(r.trading.cogs)}\nGROSS PROFIT:   KES ${fmt(r.trading.grossProfit)}\n\n`;
+  txt+=`PROFIT & LOSS\n${'─'.repeat(35)}\nGross Profit:   KES ${fmt(r.pl.grossProfit)}\nExpenses:       KES ${fmt(r.pl.expenses)}\nNET PROFIT:     KES ${fmt(r.pl.netProfit)}\n\n`;
+  txt+=`BALANCE SHEET\n${'─'.repeat(35)}\nStock Value:    KES ${fmt(r.bs.stockValue)}\nDebtors:        KES ${fmt(r.bs.debtors)}\nTotal Assets:   KES ${fmt(r.bs.totalAssets)}\nEquity:         KES ${fmt(r.bs.netProfit)}\n\n`;
+  txt+=`SALES\n${'─'.repeat(35)}\n${r.fs.map(s=>`${s.date} | ${s.id} | ${s.customer} | KES ${fmt(s.total)} | ${s.status}`).join('\n')||'None'}\n\n`;
+  txt+=`EXPENSES\n${'─'.repeat(35)}\n${r.fe.map(e=>`${e.date} | ${e.category} | ${e.description||''} | KES ${fmt(e.amount)}`).join('\n')||'None'}`;
+  dl(txt,'text/plain',`${biz.name}_Report_${r.lbl}.txt`);
+  alert('✅ Report exported!');
+}
+
+// ===== RENDER FUNCTIONS =====
+function renderInventory(){
+  let sr=(document.getElementById('stockSearch')?.value||'').toLowerCase();
+  let cf=document.getElementById('catFilter')?.value||'';
+  let sf=document.getElementById('supFilter')?.value||'';
+  let fl=inv.filter(p=>p&&p.name&&(!sr||p.name.toLowerCase().includes(sr)||(p.category||'').toLowerCase().includes(sr))&&(!cf||p.category===cf)&&(!sf||String(p.supplier_id)===sf));
+  let tb=document.getElementById('stockTableBody');if(!tb)return;
+  if(!fl.length){tb.innerHTML=`<tr><td colspan="8"><div class="empty-state"><i class="fas fa-box-open"></i><p>No items found</p></div></td></tr>`;return;}
+  tb.innerHTML=fl.map(p=>{
+    let sup=suppliers.find(s=>s.id===p.supplier_id);
+    return `<tr class="${p.qty<=p.min_qty?'low-stock-row':''}">
+    <td><strong>${esc(p.name)}</strong></td>
+    <td><span class="tag tag-cat">${esc(p.category)}</span></td>
+    <td>${sup?`<span class="sup-badge"><i class="fas fa-truck"></i>${esc(sup.name)}</span>`:'<span style="color:var(--text2);font-size:10px;">—</span>'}</td>
+    <td><span class="tag tag-unit">${esc(p.unit)}</span></td>
+    <td><strong style="color:${p.qty<=p.min_qty?'var(--danger)':'var(--success)'}">${p.qty}</strong>${p.qty<=p.min_qty?' ⚠️':''}</td>
+    <td>${fmt(p.buy_price)}</td><td><strong>${fmt(p.sell_price)}</strong></td>
+    <td><button class="btn btn-danger btn-sm" onclick="delItem(${p.id})"><i class="fas fa-trash"></i></button></td>
+  </tr>`;}).join('');
+  // Update category filter
+  let cats2=[...new Set(inv.filter(p=>p.category).map(p=>p.category))];
+  let csel=document.getElementById('catFilter');
+  if(csel)csel.innerHTML='<option value="">All Categories</option>'+cats2.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');
+  // Update supplier filter
+  let ssel=document.getElementById('supFilter');
+  if(ssel)ssel.innerHTML='<option value="">All Suppliers</option>'+suppliers.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('');
+  // Totals footer
+  let tf=document.getElementById('stockTFoot');
+  if(tf&&fl.length){
+    let tq=fl.reduce((s,p)=>s+p.qty,0);
+    let tv=fl.reduce((s,p)=>s+(p.buy_price*p.qty),0);
+    let ts2=fl.reduce((s,p)=>s+(p.sell_price*p.qty),0);
+    tf.innerHTML=`<tr><td colspan="4" class="tlbl">TOTALS (${fl.length} items)</td><td><strong>${tq} units</strong></td><td style="color:var(--danger)">KES ${fmt(tv)}</td><td style="color:var(--success)">KES ${fmt(ts2)}</td><td></td></tr>
+    <tr><td colspan="4" class="tlbl">Potential Gross Profit</td><td colspan="3" style="color:var(--primary);font-weight:800;">KES ${fmt(ts2-tv)}</td><td></td></tr>`;
+  } else if(tf){tf.innerHTML='';}
+}
+
+function renderSales(){
+  let tb=document.getElementById('salesTableBody');if(!tb)return;
+  if(!sales.length){tb.innerHTML=`<tr><td colspan="6"><div class="empty-state"><i class="fas fa-cash-register"></i><p>No sales yet</p></div></td></tr>`;return;}
+  tb.innerHTML=sales.map(s=>`<tr>
+    <td><strong style="color:var(--primary)">${esc(s.id)}</strong></td>
+    <td>${esc(s.date)}</td>
+    <td><strong>${esc(s.customer)}</strong><br><small style="color:var(--text2)">${esc(s.phone||'')}</small></td>
+    <td><strong>KES ${fmt(s.total)}</strong><br><small style="color:var(--text2)">Paid: KES ${fmt(s.paid)}</small></td>
+    <td><span class="tag tag-${(s.status||'pending').toLowerCase()}">${s.status}</span></td>
+    <td style="display:flex;gap:4px;">
+      <button class="btn btn-primary btn-sm" onclick="openReceiptShare('${s.id}')" title="Receipt"><i class="fas fa-receipt"></i></button>
+      <button class="btn btn-warning btn-sm" onclick="openEditSale('${s.id}')" title="Edit"><i class="fas fa-edit"></i></button>
+      <button class="btn btn-danger btn-sm" onclick="delSale('${s.id}')" title="Delete"><i class="fas fa-trash"></i></button>
+    </td>
+  </tr>`).join('');
+  let stf=document.getElementById('salesTFoot');
+  if(stf&&sales.length){
+    let ti=sales.reduce((s,x)=>s+(x.total||0),0);
+    let tp=sales.reduce((s,x)=>s+(x.paid||0),0);
+    let tb2=sales.reduce((s,x)=>s+(x.balance||0),0);
+    let pc=sales.filter(s=>s.status==='Paid').length,uc=sales.filter(s=>s.status!=='Paid').length;
+    stf.innerHTML=`<tr><td class="tlbl">TOTALS (${sales.length})</td><td></td><td style="font-size:11px;color:var(--text2)">✅ ${pc} Paid &nbsp;⏳ ${uc} Unpaid</td><td><div>KES ${fmt(ti)}</div><div style="font-size:10px;color:var(--success)">Collected: KES ${fmt(tp)}</div></td><td style="color:var(--danger);font-weight:800">KES ${fmt(tb2)}</td><td></td></tr>`;
+  } else if(stf){stf.innerHTML='';}
+}
+
+function renderExpenses(){
+  let tb=document.getElementById('expensesTableBody');if(!tb)return;
+  if(!expenses.length){tb.innerHTML=`<tr><td colspan="5"><div class="empty-state"><i class="fas fa-receipt"></i><p>No expenses yet</p></div></td></tr>`;return;}
+  tb.innerHTML=expenses.map(e=>`<tr>
+    <td>${esc(e.date)}</td>
+    <td><span class="tag" style="background:#fee2e2;color:#991b1b;">${esc(e.category)}</span></td>
+    <td>${esc(e.description||'—')}</td>
+    <td style="color:var(--danger);font-weight:700">KES ${fmt(e.amount)}</td>
+    <td><button class="btn btn-danger btn-sm" onclick="delExp(${e.id})"><i class="fas fa-trash"></i></button></td>
+  </tr>`).join('');
+  let etf=document.getElementById('expTFoot');
+  if(etf&&expenses.length){let tot=expenses.reduce((s,x)=>s+(x.amount||0),0);etf.innerHTML=`<tr><td class="tlbl" colspan="3">TOTAL EXPENSES (${expenses.length})</td><td style="color:var(--danger);font-size:13px;">KES ${fmt(tot)}</td><td></td></tr>`;}
+  else if(etf){etf.innerHTML='';}
+}
+
+function renderCredits(){
+  let cr=sales.filter(s=>s.balance>0);
+  let tb=document.getElementById('creditsTableBody');if(!tb)return;
+  if(!cr.length){tb.innerHTML=`<tr><td colspan="6"><div class="empty-state"><i class="fas fa-check-circle" style="color:var(--success)"></i><p>No outstanding debts!</p></div></td></tr>`;return;}
+  tb.innerHTML=cr.map(s=>`<tr style="background:var(--low-row)">
+    <td><strong>${esc(s.customer)}</strong><br><small>${esc(s.phone||'')}</small></td>
+    <td style="color:var(--primary)">${esc(s.id)}</td>
+    <td>KES ${fmt(s.total)}</td>
+    <td style="color:var(--success);font-weight:700">KES ${fmt(s.paid)}</td>
+    <td style="color:var(--danger);font-weight:700">KES ${fmt(s.balance)}</td>
+    <td><button class="btn btn-success btn-sm" onclick="recPay('${s.id}')"><i class="fas fa-money-bill-wave"></i> Pay</button></td>
+  </tr>`).join('');
+  let ctf=document.getElementById('creditsTFoot');
+  if(ctf&&cr.length){let cb=cr.reduce((s,x)=>s+(x.balance||0),0);ctf.innerHTML=`<tr><td class="tlbl" colspan="4">TOTAL OUTSTANDING (${cr.length} customers)</td><td style="color:var(--danger);font-size:13px;">KES ${fmt(cb)}</td><td></td></tr>`;}
+  else if(ctf){ctf.innerHTML='';}
+}
+
+function renderSuppliers(){
+  let tb=document.getElementById('suppliersTableBody');if(!tb)return;
+  if(!suppliers.length){tb.innerHTML=`<tr><td colspan="5"><div class="empty-state"><i class="fas fa-truck"></i><p>No suppliers yet</p></div></td></tr>`;return;}
+  tb.innerHTML=suppliers.map(s=>{
+    let itemCount=inv.filter(p=>p.supplier_id===s.id).length;
+    return `<tr>
+    <td><strong>${esc(s.name)}</strong>${s.location?`<br><small style="color:var(--text2)"><i class="fas fa-map-marker-alt"></i> ${esc(s.location)}</small>`:''}${s.notes?`<br><small style="color:var(--text2)">${esc(s.notes)}</small>`:''}</td>
+    <td>${s.phone?`<a href="tel:${esc(s.phone)}" style="color:var(--primary);text-decoration:none;font-weight:700;">${esc(s.phone)}</a>`:'—'}${s.email?`<br><small>${esc(s.email)}</small>`:''}</td>
+    <td>${s.categories?`<span class="tag tag-cat">${esc(s.categories)}</span>`:'—'}</td>
+    <td><strong>${itemCount}</strong> item${itemCount!==1?'s':''}</td>
+    <td><button class="btn btn-danger btn-sm" onclick="delSupplier(${s.id})"><i class="fas fa-trash"></i></button></td>
+  </tr>`;}).join('');
+}
+
+function renderSettings(){
+  let cd=document.getElementById('categoriesList');
+  if(cd)cd.innerHTML=cats.map(c=>`<span class="chip">${esc(c)}<i class="fas fa-times" onclick="delCat('${esc(c)}')"></i></span>`).join('');
+  let ud=document.getElementById('unitsList');
+  if(ud)ud.innerHTML=units.map(u=>`<span class="chip">${esc(u)}<i class="fas fa-times" onclick="delUnit('${esc(u)}')"></i></span>`).join('');
+  let cs=document.getElementById('catSugg');if(cs)cs.innerHTML=cats.map(c=>`<option value="${esc(c)}">`).join('');
+  applyLogo();lockSettings();
+}
+
+function renderDashboard(){
+  let lw=document.getElementById('logoWarning');if(lw)lw.style.display=logoData?'none':'block';
+  let t=td();
+  let ts=sales.filter(s=>s.date===t).reduce((s,x)=>s+(x.paid||0),0);
+  let ls=inv.filter(p=>p.qty<=p.min_qty).length;
+  let os=sales.reduce((s,x)=>s+(x.balance||0),0);
+  document.getElementById('statTotal').textContent=inv.length;
+  document.getElementById('statSales').textContent='KES '+fmt(ts);
+  document.getElementById('statLow').textContent=ls;
+  document.getElementById('statOutstanding').textContent='KES '+fmt(os);
+  let dk=document.documentElement.getAttribute('data-theme')==='dark';
+  let gc=dk?'rgba(255,255,255,.07)':'rgba(0,0,0,.05)';
+  let tc2=dk?'#94a3b8':'#64748b';
+  let days=[...Array(7)].map((_,i)=>{let d=new Date();d.setDate(d.getDate()-i);return d.toISOString().split('T')[0];}).reverse();
+  let ds=days.map(d=>sales.filter(s=>s.date===d).reduce((s,x)=>s+(x.paid||0),0));
+  let c1=document.getElementById('salesChart')?.getContext('2d');
+  if(c1){if(sc)sc.destroy();sc=new Chart(c1,{type:'line',data:{labels:days.map(d=>d.slice(5)),datasets:[{label:'KES',data:ds,borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,.12)',fill:true,tension:.4,pointBackgroundColor:'#f59e0b',pointRadius:4}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:gc},ticks:{color:tc2}},y:{grid:{color:gc},ticks:{color:tc2}}}}});}
+  let ps={};sales.forEach(s=>s.items.forEach(i=>{ps[i.name]=(ps[i.name]||0)+i.qty;}));
+  let top=Object.entries(ps).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  let c2=document.getElementById('topChart')?.getContext('2d');
+  if(c2){if(tc)tc.destroy();tc=new Chart(c2,{type:'bar',data:{labels:top.length?top.map(p=>p[0]):['No sales yet'],datasets:[{label:'Units',data:top.length?top.map(p=>p[1]):[0],backgroundColor:'#1e3a5f',borderRadius:6}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:gc},ticks:{color:tc2,font:{size:10}}},y:{grid:{color:gc},ticks:{color:tc2}}}}});}
+}
+
+function updateDDs(){
+  let sp=document.getElementById('stockInItem');
+  if(sp)sp.innerHTML=inv.map(p=>`<option value="${p.id}">${esc(p.name)} — ${esc(p.category)} (${p.qty} ${p.unit})</option>`).join('');
+  let sl=document.getElementById('salePart');
+  if(sl)sl.innerHTML=inv.map(p=>`<option value="${p.id}">${esc(p.name)} — ${esc(p.category)} | ${p.qty} ${p.unit} | KES ${fmt(p.sell_price)}</option>`).join('');
+  // Units select in add item modal
+  let us=document.getElementById('iUnit');
+  if(us){let cv=us.value;us.innerHTML=units.map(u=>`<option value="${esc(u)}" ${u===cv?'selected':''}>${esc(u)}</option>`).join('');}
+  // Supplier selects
+  let supSels=['iSupplier','stockInSupplier'];
+  supSels.forEach(id=>{let el=document.getElementById(id);if(el){let cv=el.value;el.innerHTML=(id==='stockInSupplier'?'<option value="">No Change</option>':'<option value="">No Supplier</option>')+suppliers.map(s=>`<option value="${s.id}" ${String(s.id)===cv?'selected':''}>${esc(s.name)}</option>`).join('');}});
+}
+
+function loadAllData(){
+  renderInventory();renderSales();renderExpenses();renderCredits();
+  renderSuppliers();renderSettings();renderDashboard();updateDDs();
+}
+
+// ===== MODAL HELPERS =====
+function openModal(id){
+  document.getElementById(id).style.display='flex';
+  if(id==='saleModal'){document.getElementById('saleDate').value=td();document.getElementById('salePaid').value='0';updateDDs();calcTotal();}
+  if(id==='stockInModal')updateDDs();
+  if(id==='expenseModal')document.getElementById('expenseDate').value=td();
+}
+function closeModal(id){document.getElementById(id).style.display='none';}
+function showPage(id,el){
+  let cur=document.querySelector('.page.active');
+  if(cur&&cur.id==='page-settings')lockSettings();
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById(`page-${id}`).classList.add('active');
+  (el||event.target.closest('.nav-item')).classList.add('active');
+  if(id==='reports')generateReport();
+  if(id==='settings')applyLogo();
+}
+
+// ===== INIT =====
+window.onload=function(){
+  initTheme();toggleReportDate();
+  try{let c=localStorage.getItem(SK.CREDS);if(c)creds=JSON.parse(c);}catch(e){}
+  try{let b=localStorage.getItem(SK.BIZ);if(b)biz=JSON.parse(b);}catch(e){}
+  logoData=localStorage.getItem(SK.LOGO)||null;
+  applyBizInfo();applyLogo();startClock();
+};
+</script>
+</body>
+</html>
