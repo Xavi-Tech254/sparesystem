@@ -10,6 +10,10 @@ from telegram.ext import (
     MessageHandler, filters, ContextTypes, ConversationHandler
 )
 
+def escape_md(text: str) -> str:
+    for char in ['_', '*', '`', '[']:
+        text = text.replace(char, f'\\{char}')
+    return text
 # ══════════════════════════════════════════════
 #   CONFIG — EDIT THESE
 # ══════════════════════════════════════════════
@@ -804,7 +808,7 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"📦 Product: *{prod['name']}*\n"
                 f"💰 Amount: *{prod['price']}*\n"
                 f"📅 Date: {result['date']}\n\n"
-                f"M-Pesa msg:\n`{text[:200]}`\n\n"
+                f"M-Pesa msg:\n`{escape_md(text[:200])}`\n\n"
                 f"{'✅ File link set — auto-sending.' if prod['link'] else '⚠️ No file link set. Send manually!'}"
             )
             try:
@@ -880,7 +884,7 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             try:
                 await context.bot.send_message(
                     chat_id=ADMIN_ID,
-                    text=f"⚠️ *Failed payment attempt*\n👤 {user.full_name} (@{user.username or 'N/A'}) `{user.id}`\n📦 {prod['name']}\n\nMessage:\n`{text[:200]}`",
+                    text=f"⚠️ *Failed payment attempt*\n👤 {user.full_name} (@{user.username or 'N/A'}) `{user.id}`\n📦 {prod['name']}\n\nMessage:\n`{escape_md(text[:200])}`",
                     parse_mode="Markdown"
                 )
             except:
@@ -896,7 +900,7 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"💬 *Message from user:*\n\n"
                 f"👤 {user.full_name} (@{user.username or 'N/A'})\n"
                 f"🆔 `{user.id}`\n\n"
-                f"📩 {text}\n\n"
+                f"📩 {escape_md(text)}\n\n"
                 f"_Reply with:_ `/msg {user.id} <your reply>`"
             ),
             parse_mode="Markdown"
