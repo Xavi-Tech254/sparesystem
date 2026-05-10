@@ -202,7 +202,7 @@ BASE_HTML = """<!DOCTYPE html>
     <div class="alert alert-{{ 'success' if category == 'success' else 'error' }}">{{ message }}</div>
   {% endfor %}
 {% endwith %}
-{{ content }}
+{{ content | safe }}
 </div>
 </body>
 </html>"""
