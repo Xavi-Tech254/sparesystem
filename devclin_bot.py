@@ -54,14 +54,14 @@ def get_mpesa_settings():
         return MPESA_RECEIVER_NAME, MPESA_RECEIVER_NUMBER
 
 # Me button
-ME_LINK  = "https://yourportfolio.com"
+ME_LINK  = "https://devclin.netlify.app"
 ME_LABEL = "👤 Me"
 ME_BIO   = "Built by Dev Clin 🚀\nSkyline Technologies — Elevating Digital Solutions"
 
 CYBER_IMAGE  = "https://i.postimg.cc/CLHFDLbK/Gemini-Generated-Image-avf6o5avf6o5avf6.png"
 
 ADMIN_TG  = "@yourusername"
-WHATSAPP  = "https://wa.me/234XXXXXXXXX"
+WHATSAPP  = "https://wa.me/254743810633"
 INSTAGRAM = "https://instagram.com/skyline_tech"
 
 # ══════════════════════════════════════════════
@@ -301,7 +301,6 @@ async def send_cyber_footer(update_or_query, context, caption, keyboard):
 def parse_mpesa_message(msg: str, expected_amount: float):
     """
     Parse an M-Pesa Send Money confirmation SMS and verify:
-    - Receiver name contains the configured name (e.g. Clinton Oduor)
     - Receiver phone number matches configured number (e.g. 0743810633)
     - Amount matches expected product price
     Returns (True, details_dict) or (False, error_reason)
