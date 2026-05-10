@@ -59,14 +59,14 @@ def get_mpesa_settings():
         return MPESA_RECEIVER_NAME, MPESA_RECEIVER_NUMBER
 
 # Me button
-ME_LINK  = "https://yourportfolio.com"
+ME_LINK  = "https://devclin.netlify.app"
 ME_LABEL = "👤 Me"
 ME_BIO   = "Built by Dev Clin 🚀\nSkyline Technologies — Elevating Digital Solutions"
 
 CYBER_IMAGE  = "https://i.postimg.cc/CLHFDLbK/Gemini-Generated-Image-avf6o5avf6o5avf6.png"
 
-ADMIN_TG  = "@yourusername"
-WHATSAPP  = "https://wa.me/234XXXXXXXXX"
+ADMIN_TG  = "@xaviclin"
+WHATSAPP  = "https://wa.me/254743810633"
 INSTAGRAM = "https://instagram.com/skyline_tech"
 
 # ══════════════════════════════════════════════
