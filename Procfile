@@ -1,1 +1,1 @@
-web: python main.py
+worker: python devclin_bot.py
