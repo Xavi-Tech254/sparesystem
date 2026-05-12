@@ -66,7 +66,7 @@ ME_BIO   = "Built by Dev Clin 🚀\nSkyline Technologies — Elevating Digital S
 CYBER_IMAGE  = "https://i.postimg.cc/CLHFDLbK/Gemini-Generated-Image-avf6o5avf6o5avf6.png"
 
 ADMIN_TG  = "@yourusername"
-WHATSAPP  = "https://wa.me/234XXXXXXXXX"
+WHATSAPP  = "https://wa.me/1 (780) 851-8629"
 INSTAGRAM = "https://instagram.com/skyline_tech"
 
 # ══════════════════════════════════════════════
