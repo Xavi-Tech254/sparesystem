@@ -22,9 +22,8 @@ def escape_md(text: str) -> str:
 # ══════════════════════════════════════════════
 #   CONFIG — EDIT THESE
 # ══════════════════════════════════════════════
-BOT_TOKEN    = os.environ.get("BOT_TOKEN", "8589728931:AAFTJDW94p_BOTr-q6AXua-hunOXmbXNSDQ")
-ADMIN_ID     = int(os.environ.get("ADMIN_ID", "6105493227"))
-
+BOT_TOKEN    = os.environ.get("BOT_TOKEN", "")
+ADMIN_ID     = int(os.environ.get("ADMIN_ID", "0"))
 BOT_NAME     = "Dev Clin"
 BOT_HANDLE   = "@DevClinBot"
 COMPANY      = "Skyline Technologies"
