@@ -9,7 +9,6 @@ import urllib.parse
 import urllib.error
 import json as _json
 from datetime import datetime
-import hashlib as _hashlib
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, InputMediaPhoto
 from telegram.ext import (
     Application, CommandHandler, CallbackQueryHandler,
@@ -60,14 +59,14 @@ def get_mpesa_settings():
         return MPESA_RECEIVER_NAME, MPESA_RECEIVER_NUMBER
 
 # Me button
-ME_LINK  = "https://devclin.netlify.app"
+ME_LINK  = "https://yourportfolio.com"
 ME_LABEL = "👤 Me"
 ME_BIO   = "Built by Dev Clin 🚀\nSkyline Technologies — Elevating Digital Solutions"
 
 CYBER_IMAGE  = "https://i.postimg.cc/CLHFDLbK/Gemini-Generated-Image-avf6o5avf6o5avf6.png"
 
-ADMIN_TG  = "@devclin"
-WHATSAPP  = "https://wa.me/1 (780) 851-8629"
+ADMIN_TG  = "@yourusername"
+WHATSAPP  = "https://wa.me/234XXXXXXXXX"
 INSTAGRAM = "https://instagram.com/skyline_tech"
 
 # ══════════════════════════════════════════════
@@ -184,44 +183,6 @@ def init_db():
         file_url TEXT,
         expires_at TEXT,
         used INTEGER DEFAULT 0,
-        created_at TEXT
-    )''')
-
-    # ── USER ACCOUNTS: extra columns for registration ──
-    try: c.execute("ALTER TABLE users ADD COLUMN display_name TEXT DEFAULT ''")
-    except: pass
-    try: c.execute("ALTER TABLE users ADD COLUMN password_hash TEXT DEFAULT ''")
-    except: pass
-    try: c.execute("ALTER TABLE users ADD COLUMN email TEXT DEFAULT ''")
-    except: pass
-    try: c.execute("ALTER TABLE users ADD COLUMN registered INTEGER DEFAULT 0")
-    except: pass
-    try: c.execute("ALTER TABLE users ADD COLUMN loyalty_points INTEGER DEFAULT 0")
-    except: pass
-
-    # ── LOYALTY POINTS LOG ──
-    c.execute('''CREATE TABLE IF NOT EXISTS loyalty_log (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
-        points INTEGER,
-        reason TEXT,
-        created_at TEXT
-    )''')
-
-    # ── REDOWNLOAD REQUESTS ──
-    c.execute('''CREATE TABLE IF NOT EXISTS redownload_requests (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
-        product_id TEXT,
-        product_name TEXT,
-        status TEXT DEFAULT "pending",
-        created_at TEXT
-    )''')
-
-    # ── ALERT SUBSCRIBERS ──
-    c.execute('''CREATE TABLE IF NOT EXISTS alert_subscribers (
-        user_id INTEGER PRIMARY KEY,
-        subscribed INTEGER DEFAULT 1,
         created_at TEXT
     )''')
 
@@ -418,73 +379,6 @@ def register_user(user):
     conn.commit()
     conn.close()
 
-# ══════════════════════════════════════════════
-#   ACCOUNT HELPERS
-# ══════════════════════════════════════════════
-def hash_password(pwd: str) -> str:
-    """SHA-256 hash (bcrypt-level security without external dep)."""
-    return _hashlib.sha256(pwd.encode()).hexdigest()
-
-def is_registered(user_id: int) -> bool:
-    """Check if user has completed registration."""
-    try:
-        conn = get_db()
-        row = conn.execute(
-            "SELECT registered FROM users WHERE user_id=?", (user_id,)
-        ).fetchone()
-        conn.close()
-        return bool(row and row[0])
-    except:
-        return False
-
-def get_account(user_id: int) -> dict:
-    """Get full account info for a user."""
-    try:
-        conn = get_db()
-        row = conn.execute(
-            "SELECT user_id, username, full_name, display_name, email, loyalty_points, joined_at FROM users WHERE user_id=?",
-            (user_id,)
-        ).fetchone()
-        conn.close()
-        if row:
-            return {
-                "user_id": row[0], "username": row[1], "full_name": row[2],
-                "display_name": row[3] or row[2], "email": row[4] or "",
-                "loyalty_points": row[5] or 0, "joined_at": row[6]
-            }
-    except:
-        pass
-    return {}
-
-def complete_registration(user_id: int, display_name: str, password: str, email: str):
-    """Save registration details."""
-    conn = get_db()
-    conn.execute(
-        "UPDATE users SET display_name=?, password_hash=?, email=?, registered=1 WHERE user_id=?",
-        (display_name, hash_password(password), email, user_id)
-    )
-    # Auto-subscribe to alerts
-    conn.execute(
-        "INSERT OR IGNORE INTO alert_subscribers (user_id, subscribed, created_at) VALUES (?,1,?)",
-        (user_id, datetime.now().isoformat())
-    )
-    conn.commit()
-    conn.close()
-
-def add_loyalty_points(user_id: int, points: int, reason: str):
-    """Add loyalty points to a user account."""
-    try:
-        conn = get_db()
-        conn.execute("UPDATE users SET loyalty_points = loyalty_points + ? WHERE user_id=?", (points, user_id))
-        conn.execute(
-            "INSERT INTO loyalty_log (user_id, points, reason, created_at) VALUES (?,?,?,?)",
-            (user_id, points, reason, datetime.now().isoformat())
-        )
-        conn.commit()
-        conn.close()
-    except Exception as e:
-        logger.error(f"add_loyalty_points error: {e}")
-
 def get_products(category=None, active_only=True):
     conn = get_db()
     c = conn.cursor()
@@ -557,11 +451,6 @@ AWAIT_SPOTIFY_SEARCH = 14
 AWAIT_YTMUSIC_SEARCH = 15
 AWAIT_DL_LINK        = 16
 AWAIT_AI_CHAT        = 17
-
-# ── Registration states ──
-AWAIT_REG_NAME       = 30
-AWAIT_REG_PASSWORD   = 31
-AWAIT_REG_EMAIL      = 32
 
 # Pending payments: {user_id: product_id}
 pending_payments = {}
@@ -1685,64 +1574,6 @@ async def admin_message_user(update: Update, context: ContextTypes.DEFAULT_TYPE)
         await update.message.reply_text(f"❌ Failed to send: {e}")
 
 @admin_only
-async def adminfix(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user = update.effective_user
-    conn = get_db()
-    conn.execute(
-        "UPDATE users SET registered=1, display_name='Clinton', email='admin@skyline.com' WHERE user_id=?",
-        (user.id,)
-    )
-    conn.commit()
-    conn.close()
-    add_loyalty_points(user.id, 50, "Admin welcome bonus")
-    await update.message.reply_text("✅ Admin account fixed! Now send /start")
-    
-@admin_only
-async def admin_alert_new_product(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Broadcast a new product alert to all subscribed users."""
-    args = context.args
-    if not args:
-        await update.message.reply_text(
-            "Usage: /alertproduct <product_id>\nExample: /alertproduct p7",
-            parse_mode="Markdown"
-        )
-        return
-    prod_id = args[0]
-    prod = get_product(prod_id)
-    if not prod:
-        await update.message.reply_text(f"❌ Product {prod_id} not found.")
-        return
-    conn2 = get_db()
-    subs = conn2.execute("SELECT user_id FROM alert_subscribers WHERE subscribed=1").fetchall()
-    conn2.close()
-    sent = 0; failed = 0
-    await update.message.reply_text(f"📢 Sending new product alert to {len(subs)} subscribers...")
-    for sub in subs:
-        try:
-            await context.bot.send_message(
-                chat_id=sub[0],
-                text=(
-                    f"🆕 *New Product Alert!*\n\n"
-                    f"{prod['icon']} *{prod['name']}*\n"
-                    f"💰 {prod['price']} | 📁 {prod['type']}\n\n"
-                    f"{prod['desc']}\n\n"
-                    f"Open the shop to buy now! 👇"
-                ),
-                parse_mode="Markdown",
-                reply_markup=InlineKeyboardMarkup([
-                    [InlineKeyboardButton(f"🛍 Buy {prod['name']}", callback_data=f"prod_{prod_id}")]
-                ])
-            )
-            sent += 1
-        except Exception:
-            failed += 1
-    await update.message.reply_text(
-        f"✅ Alert sent!\n📤 Delivered: {sent}\n❌ Failed: {failed}",
-        parse_mode="Markdown"
-    )
-
-
-@admin_only
 async def admin_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     args = context.args
     if not args:
@@ -1779,32 +1610,6 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text.strip()
 
     state = get_user_state(user.id)
-
-    # ── Registration flow ─────────────────────────────────────────────
-    if state == AWAIT_REG_NAME:
-        name = text.strip()
-        if len(name) < 2:
-            await update.message.reply_text("⚠️ Name too short. Please enter your full name (e.g. Xavi Clinton).")
-            return
-        await reg_ask_password(update, context, name)
-        return
-
-    if state == AWAIT_REG_PASSWORD:
-        pwd = text.strip()
-        if len(pwd) < 6:
-            await update.message.reply_text("⚠️ Password must be at least *6 characters*. Try again 👇", parse_mode="Markdown")
-            return
-        await reg_ask_email(update, context, pwd)
-        return
-
-    if state == AWAIT_REG_EMAIL:
-        email = text.strip()
-        import re as _re
-        if not _re.match(r"[^@]+@[^@]+\.[^@]+", email):
-            await update.message.reply_text("⚠️ That doesn't look like a valid email. Please try again 👇")
-            return
-        await reg_complete(update, context, email)
-        return
 
     # ── M-Pesa verification ────────────────────────────────────────────
     if state == AWAIT_MPESA_MSG or user.id in pending_payments:
@@ -1867,10 +1672,6 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             # ── ANTI-SCAM: Mark transaction used IMMEDIATELY ─────────────
             if receipt_no != "N/A":
                 mark_transaction_used(receipt_no, user.id, prod["id"])
-
-            # ── LOYALTY POINTS: 10pts per KSh 100 spent ──────────────────
-            pts_earned = max(10, int(paid_amount / 100) * 10)
-            add_loyalty_points(user.id, pts_earned, f"Purchase: {prod["name"]}")
 
             # ── Receipt block shown to user ──────────────────────────────
             receipt_text = (
@@ -2164,228 +1965,6 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.user_data.pop(f"prod_rating_{query.from_user.id}", None)
         await query.message.reply_text("👍 Enjoy your purchase!", reply_markup=InlineKeyboardMarkup([back_home_row()]))
 
-
-    # ── My Account ─────────────────────────────────────────────────────
-    elif data == "my_account":
-        acc = get_account(user_id)
-        name   = acc.get("display_name") or query.from_user.first_name
-        email  = acc.get("email") or "Not set"
-        points = acc.get("loyalty_points", 0)
-        joined = (acc.get("joined_at") or "")[:10]
-        conn2 = get_db()
-        order_count = conn2.execute(
-            "SELECT COUNT(*) FROM orders WHERE user_id=? AND status='verified'", (user_id,)
-        ).fetchone()[0]
-        conn2.close()
-        text2 = (
-            f"👤 *My Account*\n\n"
-            f"━━━━━━━━━━━━━━━━\n"
-            f"📛 Name: *{name}*\n"
-            f"📧 Email: {email}\n"
-            f"🏆 Loyalty Points: *{points} pts*\n"
-            f"🛒 Verified Orders: *{order_count}*\n"
-            f"📅 Joined: {joined}\n"
-            f"━━━━━━━━━━━━━━━━\n\n"
-            f"_Every purchase earns *10pts per KSh 100* spent!_\n"
-            f"_100pts = KSh 50 discount_ 🎁"
-        )
-        btns = [
-            [InlineKeyboardButton("🛒 My Orders",      callback_data="my_orders_btn"),
-             InlineKeyboardButton("🏆 Loyalty Points", callback_data="loyalty_info")],
-            [InlineKeyboardButton("🔄 Redownload",     callback_data="redownload_menu"),
-             InlineKeyboardButton("🔗 My Referral",    callback_data="my_referral_btn")],
-            [InlineKeyboardButton("🔔 Alert Settings", callback_data="alert_settings")],
-            back_home_row(),
-        ]
-        await send_cyber_footer(query, context, text2, btns)
-
-    elif data == "my_orders_btn":
-        acc = get_account(user_id)
-        conn2 = get_db()
-        rows = conn2.execute(
-            "SELECT product_name, amount, status, created_at FROM orders WHERE user_id=? ORDER BY id DESC LIMIT 15",
-            (user_id,)
-        ).fetchall()
-        conn2.close()
-        name = acc.get("display_name") or query.from_user.first_name
-        if not rows:
-            txt = f"🛒 *{name}'s Orders*\n\nNo orders yet! Browse the shop to get started."
-        else:
-            txt = f"🛒 *{name}'s Orders*\n\n"
-            for r in rows:
-                icon = "✅" if r[2] == "verified" else "⏳"
-                txt += f"{icon} *{r[0]}*\n💰 {r[1]} | 📅 {r[3][:10]}\n\n"
-        await send_cyber_footer(query, context, txt, [
-            [InlineKeyboardButton("🔄 Request Redownload", callback_data="redownload_menu")],
-            [InlineKeyboardButton("◀ Back", callback_data="my_account")],
-        ])
-
-    elif data == "loyalty_info":
-        acc = get_account(user_id)
-        points = acc.get("loyalty_points", 0)
-        conn2 = get_db()
-        logs = conn2.execute(
-            "SELECT points, reason, created_at FROM loyalty_log WHERE user_id=? ORDER BY id DESC LIMIT 10",
-            (user_id,)
-        ).fetchall()
-        conn2.close()
-        txt = (
-            f"🏆 *Loyalty Points*\n\n"
-            f"Your balance: *{points} pts*\n\n"
-            f"━━━━━━━━━━━━━━━━\n"
-            f"*How to earn:*\n"
-            f"• Every purchase earns 10pts per KSh 100\n"
-            f"• Welcome bonus: 50pts\n"
-            f"• Referral bonus: 20pts\n\n"
-            f"*How to redeem:*\n"
-            f"100pts = KSh 50 discount — contact admin\n\n"
-            f"━━━━━━━━━━━━━━━━\n"
-            f"*Recent activity:*\n"
-        )
-        for log in logs:
-            sign = "+" if log[0] > 0 else ""
-            txt += f"• {sign}{log[0]}pts — {log[1]} ({log[2][:10]})\n"
-        if not logs:
-            txt += "_No activity yet_"
-        await send_cyber_footer(query, context, txt, [
-            [InlineKeyboardButton("💬 Redeem Points", url=f"https://t.me/{ADMIN_TG.replace('@','')}")],
-            [InlineKeyboardButton("◀ Back", callback_data="my_account")],
-        ])
-
-    elif data == "redownload_menu":
-        conn2 = get_db()
-        purchases = conn2.execute(
-            "SELECT DISTINCT product_id, product_name FROM orders WHERE user_id=? AND status='verified'",
-            (user_id,)
-        ).fetchall()
-        conn2.close()
-        if not purchases:
-            await send_cyber_footer(query, context,
-                "🔄 *Redownload*\n\nNo verified purchases found. Buy something first!",
-                [[InlineKeyboardButton("🛍 Shop", callback_data="shop"),
-                  InlineKeyboardButton("◀ Back", callback_data="my_account")]]
-            )
-            return
-        btns = [
-            [InlineKeyboardButton(f"📦 {p[1]}", callback_data=f"req_redl_{p[0]}")]
-            for p in purchases
-        ]
-        btns.append([InlineKeyboardButton("◀ Back", callback_data="my_account")])
-        await send_cyber_footer(query, context,
-            "🔄 *Request Redownload*\n\nSelect the product you need re-sent 👇",
-            btns
-        )
-
-    elif data.startswith("req_redl_"):
-        prod_id2 = data[9:]
-        prod2 = get_product(prod_id2)
-        name2 = prod2["name"] if prod2 else prod_id2
-        conn2 = get_db()
-        conn2.execute(
-            "INSERT INTO redownload_requests (user_id, product_id, product_name, status, created_at) VALUES (?,?,?,'pending',?)",
-            (user_id, prod_id2, name2, datetime.now().isoformat())
-        )
-        conn2.commit()
-        conn2.close()
-        try:
-            acc2 = get_account(user_id)
-            await context.bot.send_message(
-                chat_id=ADMIN_ID,
-                text=(
-                    f"🔄 *Redownload Request*\n\n"
-                    f"👤 {acc2.get('display_name') or query.from_user.full_name}\n"
-                    f"🆔 `{user_id}`\n"
-                    f"📦 Product: *{name2}*\n\n"
-                    f"Reply: `/msg {user_id} <download link>`"
-                ),
-                parse_mode="Markdown"
-            )
-        except Exception as e:
-            logger.error(f"Redownload notify error: {e}")
-        await send_cyber_footer(query, context,
-            f"✅ *Redownload Requested!*\n\n📦 *{name2}*\n\nAdmin notified — file will be resent shortly. ⏳",
-            [[InlineKeyboardButton("🏠 Home", callback_data="home")]]
-        )
-
-    elif data == "alert_settings":
-        conn2 = get_db()
-        row2 = conn2.execute("SELECT subscribed FROM alert_subscribers WHERE user_id=?", (user_id,)).fetchone()
-        conn2.close()
-        subbed = row2 and row2[0]
-        status_txt = "🔔 *ON* — you receive new product alerts" if subbed else "🔕 *OFF* — not receiving alerts"
-        await send_cyber_footer(query, context,
-            f"🔔 *Alert Settings*\n\nNew product notifications:\n{status_txt}",
-            [
-                [InlineKeyboardButton("🔕 Turn OFF" if subbed else "🔔 Turn ON",
-                    callback_data="toggle_alerts")],
-                [InlineKeyboardButton("◀ Back", callback_data="my_account")],
-            ]
-        )
-
-    elif data == "toggle_alerts":
-        conn2 = get_db()
-        row2 = conn2.execute("SELECT subscribed FROM alert_subscribers WHERE user_id=?", (user_id,)).fetchone()
-        new_val = 0 if (row2 and row2[0]) else 1
-        conn2.execute(
-            "INSERT OR REPLACE INTO alert_subscribers (user_id, subscribed, created_at) VALUES (?,?,?)",
-            (user_id, new_val, datetime.now().isoformat())
-        )
-        conn2.commit()
-        conn2.close()
-        msg2 = "🔔 Alerts *turned ON*! You'll be notified of new products." if new_val else "🔕 Alerts *turned OFF*."
-        await send_cyber_footer(query, context, msg2,
-            [[InlineKeyboardButton("◀ Back", callback_data="alert_settings")]]
-        )
-
-    elif data == "my_referral_btn":
-        bot_me = await context.bot.get_me()
-        ref_link = f"https://t.me/{bot_me.username}?start=ref_{user_id}"
-        txt = (
-            f"🔗 *Your Referral Link*\n\n"
-            f"`{ref_link}`\n\n"
-            f"🏆 Earn *20 loyalty points* for every friend who joins!\n\n"
-            f"_Tap to copy and share_ 👆"
-        )
-        await send_cyber_footer(query, context, txt, [
-            [InlineKeyboardButton("📤 Share", url=f"https://t.me/share/url?url={ref_link}&text=Check+out+{BOT_NAME}!")],
-            [InlineKeyboardButton("◀ Back", callback_data="my_account")],
-        ])
-
-    elif data == "reg_cancel":
-        clear_user_state(user_id)
-        context.user_data.pop(f"reg_name_{user_id}", None)
-        context.user_data.pop(f"reg_pass_{user_id}", None)
-        await query.message.reply_text("Registration cancelled. Use /start to try again.")
-
-    elif data == "reg_skip_email":
-        user_id2 = query.from_user.id
-        name3  = context.user_data.pop(f"reg_name_{user_id2}", query.from_user.first_name)
-        pass3  = context.user_data.pop(f"reg_pass_{user_id2}", "default")
-        complete_registration(user_id2, name3, pass3, "")
-        clear_user_state(user_id2)
-        add_loyalty_points(user_id2, 50, "Welcome bonus")
-        _s2 = get_settings()
-        banner2 = _s2.get("bot_banner_image", "") or CYBER_IMAGE
-        keyboard2 = [
-            [InlineKeyboardButton("🛍 Shop",        callback_data="shop"),
-             InlineKeyboardButton("🛠 Services",    callback_data="services")],
-            [InlineKeyboardButton("👤 My Account",  callback_data="my_account"),
-             InlineKeyboardButton("📞 Contact",     callback_data="contact")],
-            [me_button()],
-        ]
-        await query.message.reply_photo(
-            photo=banner2,
-            caption=(
-                f"🎉 *Account Created!*\n\n"
-                f"Welcome, *{name3}!* 🚀\n\n"
-                f"🏆 You earned *50 loyalty points* as a welcome bonus!\n\n"
-                f"━━━━━━━━━━━━━━━━\n"
-                f"{WELCOME_MSG}"
-            ),
-            parse_mode="Markdown",
-            reply_markup=InlineKeyboardMarkup(keyboard2)
-        )
-
     # ── AI ─────────────────────────────────────────────────────────────
     elif data == "ai_menu":
         await show_ai_menu(query, context)
@@ -2513,162 +2092,10 @@ async def inline_query_handler(update: Update, context: ContextTypes.DEFAULT_TYP
 # ══════════════════════════════════════════════
 #   Handle /start with referral param
 # ══════════════════════════════════════════════
-# ══════════════════════════════════════════════
-#   REGISTRATION FLOW
-# ══════════════════════════════════════════════
-async def begin_registration(update_or_msg, context):
-    """Step 1 — Ask for display name."""
-    # Works with both Update objects and message objects
-    msg = update_or_msg.message if hasattr(update_or_msg, "message") else update_or_msg
-    user_id = msg.chat_id
-    set_user_state(user_id, AWAIT_REG_NAME)
-    _s = get_settings()
-    banner = _s.get("bot_banner_image", "") or CYBER_IMAGE
-    await msg.reply_photo(
-        photo=banner,
-        caption=(
-            f"👋 *Welcome to {BOT_NAME}!*\n"
-            f"🏙 _{COMPANY}_\n\n"
-            f"Let's set up your account in 3 quick steps.\n\n"
-            f"*Step 1 of 3*\n"
-            f"━━━━━━━━━━━━━━━━\n"
-            f"📝 What should we call you?\n\n"
-            f"_Type your full name below (e.g. Xavi Clinton)_ 👇"
-        ),
-        parse_mode="Markdown",
-        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("❌ Cancel", callback_data="reg_cancel")]])
-    )
-
-async def reg_ask_password(update: Update, context: ContextTypes.DEFAULT_TYPE, name: str):
-    """Step 2 - Ask for password."""
-    user_id = update.effective_user.id
-    context.user_data[f"reg_name_{user_id}"] = name
-    set_user_state(user_id, AWAIT_REG_PASSWORD)
-    await update.message.reply_text(
-        f"\u2705 Nice to meet you, *{name}!*\n\n"
-        f"*Step 2 of 3*\n"
-        f"\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n"
-        f"\U0001f510 Create a *password* for your account\n\n"
-        f"\u2022 Minimum 6 characters\n"
-        f"\u2022 Mix letters and numbers for security\n\n"
-        f"_Type your password below_ \U0001f447",
-        parse_mode="Markdown",
-        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("\u274c Cancel", callback_data="reg_cancel")]])
-    )
-
-async def reg_ask_email(update: Update, context: ContextTypes.DEFAULT_TYPE, password: str):
-    """Step 3 - Ask for email."""
-    user_id = update.effective_user.id
-    context.user_data[f"reg_pass_{user_id}"] = password
-    set_user_state(user_id, AWAIT_REG_EMAIL)
-    await update.message.reply_text(
-        "\U0001f510 *Password saved!*\n\n"
-        "*Step 3 of 3 \u2014 Last one!*\n"
-        "\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n"
-        "\U0001f4e7 What's your *email address*?\n\n"
-        "_Used for receipts and account recovery_\n\n"
-        "_Type your email below_ \U0001f447",
-        parse_mode="Markdown",
-        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("\u23ed Skip Email", callback_data="reg_skip_email")]])
-    )
-
-async def reg_complete(update: Update, context: ContextTypes.DEFAULT_TYPE, email: str):
-    """Finish registration and show main menu."""
-    user    = update.effective_user
-    user_id = user.id
-    name    = context.user_data.pop(f"reg_name_{user_id}", user.first_name)
-    password = context.user_data.pop(f"reg_pass_{user_id}", "default")
-
-    complete_registration(user_id, name, password, email)
-    clear_user_state(user_id)
-    add_loyalty_points(user_id, 50, "Welcome bonus")
-
-    _s = get_settings()
-    banner = _s.get("bot_banner_image", "") or CYBER_IMAGE
-    keyboard = [
-        [InlineKeyboardButton("🛍 Shop",        callback_data="shop"),
-         InlineKeyboardButton("🛠 Services",    callback_data="services")],
-        [InlineKeyboardButton("⏬ Downloader",      callback_data="downloader_menu"),
-         InlineKeyboardButton("💬 Group Chat",  callback_data="group_chat")],
-        [InlineKeyboardButton("🤖 AI Assistant",callback_data="ai_menu"),
-         InlineKeyboardButton("🔗 Links",       callback_data="links")],
-        [InlineKeyboardButton("👤 My Account",  callback_data="my_account"),
-         InlineKeyboardButton("📞 Contact",     callback_data="contact")],
-        [me_button()],
-    ]
-    await update.message.reply_photo(
-        photo=banner,
-        caption=(
-            f"🎉 *Account Created Successfully!*\n\n"
-            f"Welcome aboard, *{name}!* 🚀\n\n"
-            f"🏆 You earned *50 loyalty points* as a welcome bonus!\n\n"
-            f"━━━━━━━━━━━━━━━━\n"
-            f"{WELCOME_MSG}"
-        ),
-        parse_mode="Markdown",
-        reply_markup=InlineKeyboardMarkup(keyboard)
-    )
-    try:
-        await context.bot.send_message(
-            chat_id=ADMIN_ID,
-            text=(
-                f"🆕 *New User Registered!*\n\n"
-                f"👤 Name: *{name}*\n"
-                f"📧 Email: {email or 'Not provided'}\n"
-                f"🔗 Telegram: @{user.username or 'N/A'}\n"
-                f"🆔 ID: `{user_id}`"
-            ),
-            parse_mode="Markdown"
-        )
-    except:
-        pass
-
-
 async def start_with_ref(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     register_user(user)
     user_states.pop(user.id, None)
-
-    # ── Check if user has completed registration ──────────────────────
-    if not is_registered(user.id):
-        # Check for referral param — save for after registration
-        if context.args and context.args[0].startswith("ref_"):
-            context.user_data[f"pending_ref_{user.id}"] = context.args[0]
-        await begin_registration(update, context)
-        return
-
-    # ── Returning user — personalised welcome ─────────────────────────
-    account = get_account(user.id)
-    display_name = account.get("display_name") or user.first_name
-    points = account.get("loyalty_points", 0)
-    _s = get_settings()
-    banner = _s.get("bot_banner_image", "") or CYBER_IMAGE
-
-    keyboard = [
-        [InlineKeyboardButton("🛍 Shop",        callback_data="shop"),
-         InlineKeyboardButton("🛠 Services",    callback_data="services")],
-        [InlineKeyboardButton("⬇️ Downloader",  callback_data="downloader_menu"),
-         InlineKeyboardButton("💬 Group Chat",   callback_data="group_chat")],
-        [InlineKeyboardButton("🤖 AI Assistant",callback_data="ai_menu"),
-         InlineKeyboardButton("🔗 Links",       callback_data="links")],
-        [InlineKeyboardButton("👤 My Account",  callback_data="my_account"),
-         InlineKeyboardButton("📞 Contact",     callback_data="contact")],
-        [me_button()],
-    ]
-    await update.message.reply_photo(
-        photo=banner,
-        caption=(
-            f"\U0001f44b *Hello, {display_name}!*\n\n"
-            f"Welcome back to *{BOT_NAME}* \U0001f680\n"
-            f"\U0001f3d9 _{COMPANY}_\n\n"
-            f"\U0001f3c6 Loyalty Points: *{points} pts*\n\n"
-            f"\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n"
-            f"What would you like to do today? \U0001f447"
-        ),
-        parse_mode="Markdown",
-        reply_markup=InlineKeyboardMarkup(keyboard)
-    )
-    return
 
     # Check for referral
     if context.args and context.args[0].startswith("ref_"):
@@ -2677,7 +2104,6 @@ async def start_with_ref(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ref_id_int = int(ref_id)
             if ref_id_int != user.id:
                 try:
-                    add_loyalty_points(ref_id_int, 20, f"Referral: {user.first_name} joined")
                     await context.bot.send_message(
                         chat_id=ref_id_int,
                         text=f"🎉 *{user.first_name}* just joined via your referral link!\n\nContact admin to claim your reward 👇",
@@ -2726,10 +2152,8 @@ def main():
     app.add_handler(CommandHandler("users",          admin_list_users))
     app.add_handler(CommandHandler("msg",            admin_message_user))
     app.add_handler(CommandHandler("broadcast",      admin_broadcast))
-    app.add_handler(CommandHandler("alertproduct",    admin_alert_new_product))
     app.add_handler(CommandHandler("orders",         admin_orders))
-    app.add_handler(CommandHandler("adminfix",       adminfix))
-    
+
     # Inline mode
     from telegram.ext import InlineQueryHandler
     app.add_handler(InlineQueryHandler(inline_query_handler))
@@ -2748,11 +2172,7 @@ def main():
         jq.run_daily(send_scheduled_quote, time=_dt.time(18, 0))   # 9:00 PM EAT
 
     logger.info(f"🚀 {BOT_NAME} bot is running...")
-    logger.info(f"🚀 {BOT_NAME} bot is running...")
-    import asyncio
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    loop.run_until_complete(app.run_polling(allowed_updates=Update.ALL_TYPES))
+    app.run_polling(allowed_updates=Update.ALL_TYPES)
 
 if __name__ == "__main__":
     main()
