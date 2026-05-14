@@ -19,7 +19,7 @@ app.secret_key = "devclin_secret_2024_change_this"
 #   CONFIG
 # ══════════════════════════════════════════════
 DB_PATH       = "devclin.db"
-BOT_TOKEN      = os.environ.get("BOT_TOKEN", "8589728931:AAFTJDW94p_BOTr-q6AXua-hunOXmbXNSDQ")
+BOT_TOKEN      = os.environ.get("BOT_TOKEN", "")
 ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "admin")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "devclin2024")
 
