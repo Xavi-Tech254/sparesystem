@@ -1122,7 +1122,7 @@ def bot_settings():
         </div>
         <div class="form-group">
           <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
-            <input type="checkbox" name="quotes_enabled" {"checked" if quotes_on=="1" else ""}> 
+            <input type="checkbox" name="quotes_enabled" {quotes_checked}> 
             ENABLE DAILY QUOTES (6:30AM, 12PM, 3PM, 9PM)
           </label>
         </div>
@@ -1132,6 +1132,7 @@ def bot_settings():
         banner_img=settings.get("bot_banner_image",""),
         admin_logo=settings.get("admin_logo",""),
         group_link=settings.get("group_chat_link",""),
-        quotes_on=settings.get("quotes_enabled","1")
+        quotes_on=settings.get("quotes_enabled","1"),
+        quotes_checked="checked" if settings.get("quotes_enabled","1")=="1" else ""
     )
     return render_page(content, "settings")
