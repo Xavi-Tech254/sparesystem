@@ -1,9 +1,4 @@
-# Dev Clin Telegram Bot — Python Dependencies
-# Install with: pip install -r requirements.txt
-
-# Telegram Bot framework (python-telegram-bot v20+ with job queue support)
-python-telegram-bot[job-queue]==20.7
-
-# All other imports are Python standard library:
-# asyncio, hashlib, json, logging, os, random, re, secrets, sqlite3,
-# urllib, uuid, datetime — no extra install needed
+python-telegram-bot==20.7
+flask==3.0.0
+requests==2.31.0
+yt-dlp
