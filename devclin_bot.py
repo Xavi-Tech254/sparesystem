@@ -2172,6 +2172,8 @@ def main():
         jq.run_daily(send_scheduled_quote, time=_dt.time(18, 0))   # 9:00 PM EAT
 
     logger.info(f"🚀 {BOT_NAME} bot is running...")
+    import asyncio
+    asyncio.set_event_loop(asyncio.new_event_loop())
     app.run_polling(allowed_updates=Update.ALL_TYPES)
 
 if __name__ == "__main__":
