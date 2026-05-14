@@ -731,8 +731,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
          InlineKeyboardButton("💬 Group Chat",   callback_data="group_chat")],
         [InlineKeyboardButton("🤖 AI Assistant",callback_data="ai_menu"),
          InlineKeyboardButton("🔗 Links",       callback_data="links")],
-        [InlineKeyboardButton("ℹ About",        callback_data="about"),
+        [InlineKeyboardButton("👤 My Account",  callback_data="my_account"),
          InlineKeyboardButton("📞 Contact",     callback_data="contact")],
+        [InlineKeyboardButton("⭐ Rate Us",      callback_data="rate_bot")],
         [me_button()],
     ]
     await send_cyber_footer(update, context, WELCOME_MSG, keyboard)
