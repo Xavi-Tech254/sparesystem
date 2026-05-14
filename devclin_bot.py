@@ -14,6 +14,19 @@ from telegram.ext import (
     Application, CommandHandler, CallbackQueryHandler,
     MessageHandler, filters, ContextTypes, ConversationHandler
 )
+from flask import Flask
+from threading import Thread
+
+app_web = Flask(__name__)
+
+@app_web.route('/')
+def home():
+    return "Dev Clin Bot is running!"
+
+def run_web():
+    app_web.run(host='0.0.0.0', port=8080)
+
+Thread(target=run_web, daemon=True).start()
 
 def escape_md(text: str) -> str:
     for char in ['_', '*', '`', '[']:
