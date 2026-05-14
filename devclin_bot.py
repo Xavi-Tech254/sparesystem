@@ -1685,6 +1685,19 @@ async def admin_message_user(update: Update, context: ContextTypes.DEFAULT_TYPE)
         await update.message.reply_text(f"❌ Failed to send: {e}")
 
 @admin_only
+async def adminfix(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    conn = get_db()
+    conn.execute(
+        "UPDATE users SET registered=1, display_name='Clinton', email='admin@skyline.com' WHERE user_id=?",
+        (user.id,)
+    )
+    conn.commit()
+    conn.close()
+    add_loyalty_points(user.id, 50, "Admin welcome bonus")
+    await update.message.reply_text("✅ Admin account fixed! Now send /start")
+    
+@admin_only
 async def admin_alert_new_product(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Broadcast a new product alert to all subscribed users."""
     args = context.args
@@ -2715,7 +2728,8 @@ def main():
     app.add_handler(CommandHandler("broadcast",      admin_broadcast))
     app.add_handler(CommandHandler("alertproduct",    admin_alert_new_product))
     app.add_handler(CommandHandler("orders",         admin_orders))
-
+    app.add_handler(CommandHandler("adminfix",       adminfix))
+    
     # Inline mode
     from telegram.ext import InlineQueryHandler
     app.add_handler(InlineQueryHandler(inline_query_handler))
