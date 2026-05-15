@@ -2173,7 +2173,7 @@ def main():
     logger.info(f"🚀 {BOT_NAME} bot is running...")
     import asyncio
     asyncio.set_event_loop(asyncio.new_event_loop())
-    app.run_polling(allowed_updates=Update.ALL_TYPES)
+    app.run_polling(allowed_updates=Update.ALL_TYPES, drop_pending_updates=True)
 
 if __name__ == "__main__":
     main()
