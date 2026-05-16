@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dev Clin — Skyline Technologies</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#08080e;--panel:#0f0f18;--border:#1a1a2e;--accent:#00ff88;--accent2:#7c3aed;--accent3:#ff6b35;--text:#e2e2f0;--muted:#5a5a7a;--card:#111120;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;overflow-x:hidden;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-thumb{background:var(--accent2);border-radius:2px;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,136,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,.022) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:0;}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:300;display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:56px;background:rgba(8,8,14,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+.logo{font-family:'Space Mono',monospace;font-size:16px;font-weight:700;color:var(--accent);text-decoration:none;}
+.logo em{color:var(--text);font-style:normal;}
+.nav-tabs{display:flex;gap:2px;}
+.nav-tab{background:none;border:none;color:var(--muted);font-family:'Syne',sans-serif;font-size:13px;font-weight:600;padding:8px 14px;border-radius:8px;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.nav-tab:hover{color:var(--text);background:rgba(255,255,255,.05);}
+.nav-tab.active{color:var(--accent);background:rgba(0,255,136,.08);}
+.hamburger{display:none;background:none;border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:15px;}
+
+/* MOBILE NAV */
+.mob-nav{display:none;flex-direction:column;background:var(--panel);border-bottom:1px solid var(--border);position:sticky;top:56px;z-index:299;}
+.mob-nav.open{display:flex;}
+.mob-tab{background:none;border:none;border-bottom:1px solid var(--border);color:var(--muted);font-family:'Syne',sans-serif;font-size:14px;font-weight:600;padding:14px 20px;cursor:pointer;text-align:left;transition:color .2s;}
+.mob-tab.active,.mob-tab:hover{color:var(--accent);}
+
+/* SECTIONS */
+.section{display:none;position:relative;z-index:1;min-height:calc(100vh - 56px);}
+.section.active{display:block;}
+
+/* HERO (home) */
+.hero{padding:80px 24px 60px;text-align:center;position:relative;}
+.hero::after{content:'';position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(0,255,136,.07) 0%,transparent 65%);pointer-events:none;}
+.live-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,255,136,.07);border:1px solid rgba(0,255,136,.18);border-radius:100px;padding:6px 16px;margin-bottom:24px;font-family:'Space Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:1.5px;}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulse 1.8s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(.7);}}
+.hero h1{font-size:clamp(34px,7vw,68px);font-weight:800;line-height:1.05;letter-spacing:-2px;margin-bottom:16px;}
+.green{color:var(--accent);}.purple{color:#a78bfa;}.orange{color:var(--accent3);}
+.hero p{font-size:16px;color:var(--muted);max-width:460px;margin:0 auto 36px;line-height:1.7;}
+.menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:460px;margin:0 auto;}
+.menu-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 12px;cursor:pointer;transition:all .2s;text-align:center;}
+.menu-card:hover{border-color:rgba(0,255,136,.35);transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,.4);}
+.menu-card .icon{font-size:28px;margin-bottom:8px;}
+.menu-card .label{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.5px;}
+
+/* STATS */
+.stats{display:flex;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--panel);margin-top:60px;}
+.stat{flex:1;text-align:center;padding:18px 10px;border-right:1px solid var(--border);}
+.stat:last-child{border-right:none;}
+.stat-n{font-family:'Space Mono',monospace;font-size:24px;font-weight:700;color:var(--accent);display:block;}
+.stat-l{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:3px;display:block;}
+
+/* SHOP */
+.shop-wrap{max-width:1100px;margin:0 auto;padding:40px 20px;}
+.sec-title{font-size:24px;font-weight:800;letter-spacing:-.5px;margin-bottom:20px;}
+.sec-title span{color:var(--accent);}
+.cats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px;}
+.cat-btn{padding:7px 16px;border-radius:100px;border:1px solid var(--border);background:var(--panel);color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Syne',sans-serif;}
+.cat-btn:hover{border-color:var(--accent);color:var(--accent);}
+.cat-btn.active{background:var(--accent);color:#000;border-color:var(--accent);}
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
+.prod-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:all .2s;position:relative;}
+.prod-card:hover{border-color:rgba(0,255,136,.3);transform:translateY(-3px);box-shadow:0 10px 36px rgba(0,0,0,.4);}
+.prod-img{width:100%;height:160px;object-fit:cover;}
+.prod-placeholder{width:100%;height:160px;display:flex;align-items:center;justify-content:center;font-size:48px;background:linear-gradient(135deg,#0d0d1f,#151530);}
+.prod-body{padding:16px;}
+.prod-cat{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent2);margin-bottom:6px;font-family:'Space Mono',monospace;}
+.prod-name{font-size:15px;font-weight:700;margin-bottom:6px;line-height:1.3;}
+.prod-desc{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.prod-footer{display:flex;align-items:center;justify-content:space-between;}
+.prod-price{font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:var(--accent);}
+.price-orig{font-size:10px;color:var(--muted);text-decoration:line-through;margin-right:5px;}
+.price-sale{color:var(--accent3);}
+.prod-type{font-size:9px;font-weight:700;letter-spacing:1px;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.25);color:#a78bfa;padding:2px 7px;border-radius:4px;}
+.sale-tag{position:absolute;top:10px;right:10px;background:var(--accent3);color:#fff;font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;}
+
+/* SKELETON */
+.skel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
+.skel{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.skel-img{height:160px;background:var(--border);}
+.skel-body{padding:16px;}
+.skel-line{height:12px;border-radius:4px;background:var(--border);margin-bottom:8px;animation:sh 1.4s infinite;}
+.skel-line.s{width:40%;}.skel-line.m{width:70%;}
+@keyframes sh{0%,100%{opacity:.4;}50%{opacity:.9;}}
+.empty-msg{text-align:center;padding:60px 20px;color:var(--muted);font-size:15px;}
+
+/* DOWNLOADER */
+.dl-wrap{max-width:600px;margin:0 auto;padding:50px 20px;}
+.dl-platforms{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:32px;}
+.dl-plat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s;}
+.dl-plat:hover,.dl-plat.active{border-color:var(--accent);background:rgba(0,255,136,.06);}
+.dl-plat .pi{font-size:24px;margin-bottom:6px;}
+.dl-plat .pn{font-size:11px;font-weight:700;color:var(--muted);}
+.dl-plat.active .pn{color:var(--accent);}
+.input-row{display:flex;gap:10px;margin-bottom:20px;}
+.url-input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:13px 16px;color:var(--text);font-family:'Syne',sans-serif;font-size:14px;outline:none;transition:border-color .2s;}
+.url-input:focus{border-color:var(--accent);}
+.dl-btn{background:var(--accent);color:#000;border:none;border-radius:10px;padding:13px 22px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;transition:all .15s;white-space:nowrap;}
+.dl-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,255,136,.3);}
+.dl-btn:disabled{opacity:.5;cursor:not-allowed;}
+.dl-result{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;display:none;}
+.dl-result.show{display:block;}
+.dl-title{font-size:14px;font-weight:700;margin-bottom:12px;line-height:1.4;}
+.dl-actions{display:flex;gap:10px;flex-wrap:wrap;}
+.dl-link{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#000;padding:11px 20px;border-radius:9px;font-size:13px;font-weight:700;text-decoration:none;transition:all .15s;}
+.dl-link:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,255,136,.3);}
+.dl-link.secondary{background:var(--panel);color:var(--text);border:1px solid var(--border);}
+.dl-error{background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.2);border-radius:10px;padding:14px 16px;color:#ff8080;font-size:13px;display:none;}
+.dl-error.show{display:block;}
+.dl-loading{text-align:center;padding:30px;display:none;color:var(--muted);font-size:14px;}
+.dl-loading.show{display:block;}
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* AI CHAT */
+.ai-wrap{max-width:680px;margin:0 auto;padding:30px 20px;display:flex;flex-direction:column;height:calc(100vh - 56px);}
+.chat-box{flex:1;overflow-y:auto;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:14px;display:flex;flex-direction:column;gap:14px;}
+.msg{max-width:80%;padding:12px 16px;border-radius:12px;font-size:14px;line-height:1.6;}
+.msg.user{background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.2);align-self:flex-end;color:var(--text);}
+.msg.bot{background:var(--panel);border:1px solid var(--border);align-self:flex-start;color:var(--text);}
+.msg.bot.typing{color:var(--muted);}
+.chat-input-row{display:flex;gap:10px;}
+.chat-input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:13px 16px;color:var(--text);font-family:'Syne',sans-serif;font-size:14px;outline:none;transition:border-color .2s;}
+.chat-input:focus{border-color:var(--accent);}
+.send-btn{background:var(--accent);color:#000;border:none;border-radius:10px;padding:13px 20px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;transition:all .15s;}
+.send-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,255,136,.25);}
+.send-btn:disabled{opacity:.5;cursor:not-allowed;}
+.ai-disclaimer{font-size:11px;color:var(--muted);text-align:center;padding:6px 0;letter-spacing:.3px;}
+
+/* CONTACT */
+.contact-wrap{max-width:560px;margin:0 auto;padding:50px 20px;}
+.contact-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px;margin-bottom:16px;display:flex;align-items:center;gap:18px;text-decoration:none;color:var(--text);transition:all .2s;}
+.contact-card:hover{border-color:rgba(0,255,136,.3);transform:translateY(-2px);}
+.contact-icon{font-size:30px;flex-shrink:0;}
+.contact-info .cn{font-size:15px;font-weight:700;margin-bottom:4px;}
+.contact-info .cs{font-size:13px;color:var(--muted);}
+
+/* ABOUT */
+.about-wrap{max-width:600px;margin:0 auto;padding:50px 20px;}
+.about-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px;margin-bottom:16px;}
+.about-title{font-size:18px;font-weight:800;margin-bottom:12px;}
+.about-title span{color:var(--accent);}
+.about-list{list-style:none;display:flex;flex-direction:column;gap:8px;}
+.about-list li{font-size:14px;color:var(--muted);padding-left:4px;}
+
+/* RATE */
+.rate-wrap{max-width:520px;margin:0 auto;padding:50px 20px;}
+.stars{display:flex;gap:10px;justify-content:center;margin:20px 0;}
+.star{font-size:36px;cursor:pointer;transition:transform .15s;filter:grayscale(1)opacity(.4);}
+.star.active,.star:hover{filter:none;transform:scale(1.15);}
+.rate-form{display:none;}
+.rate-form.show{display:block;}
+.rate-textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:13px 16px;color:var(--text);font-family:'Syne',sans-serif;font-size:14px;outline:none;resize:vertical;min-height:110px;margin:12px 0;transition:border-color .2s;}
+.rate-textarea:focus{border-color:var(--accent);}
+.rate-submit{width:100%;background:var(--accent);color:#000;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;transition:all .15s;}
+.rate-submit:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,255,136,.3);}
+.rate-submit:disabled{opacity:.5;cursor:not-allowed;}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .25s;}
+.overlay.open{opacity:1;pointer-events:all;}
+.modal-wrap{position:relative;width:100%;max-width:500px;}
+.modal{background:var(--panel);border:1px solid var(--border);border-radius:16px;width:100%;max-height:90vh;overflow-y:auto;transform:translateY(24px) scale(.97);transition:transform .25s;}
+.overlay.open .modal{transform:translateY(0) scale(1);}
+.m-close{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.5);border:none;border-radius:50%;width:32px;height:32px;color:var(--text);font-size:14px;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;transition:background .2s;}
+.m-close:hover{background:rgba(255,255,255,.15);}
+.m-img{width:100%;max-height:200px;object-fit:cover;border-radius:14px 14px 0 0;}
+.m-img-ph{height:160px;border-radius:14px 14px 0 0;display:flex;align-items:center;justify-content:center;font-size:64px;background:linear-gradient(135deg,#0d0d1f,#1a1a35);}
+.m-body{padding:24px;}
+.m-cat{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent2);font-family:'Space Mono',monospace;margin-bottom:8px;}
+.m-name{font-size:20px;font-weight:800;margin-bottom:10px;line-height:1.2;}
+.m-desc{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:18px;}
+.m-price{font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--accent);margin-bottom:22px;}
+.step{display:none;}.step.active{display:block;}
+.step-hd{font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.step-n{width:24px;height:24px;border-radius:50%;background:var(--accent);color:#000;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.mpesa-box{background:rgba(0,255,136,.05);border:1px solid rgba(0,255,136,.2);border-radius:10px;padding:18px;margin-bottom:16px;text-align:center;}
+.mp-label{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-family:'Space Mono',monospace;margin-bottom:5px;}
+.mp-name{font-size:16px;font-weight:700;color:var(--accent);margin-bottom:3px;}
+.mp-num{font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--text);letter-spacing:2px;}
+.mp-amt{margin-top:10px;padding-top:10px;border-top:1px solid rgba(0,255,136,.1);font-size:12px;color:var(--muted);}
+.mp-amt strong{color:var(--accent3);font-size:15px;}
+.fg{margin-bottom:14px;}
+.fg label{display:block;font-size:10px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase;font-family:'Space Mono',monospace;margin-bottom:7px;}
+.fg input,.fg textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:11px 13px;color:var(--text);font-family:'Syne',sans-serif;font-size:13px;outline:none;transition:border-color .2s;}
+.fg textarea{resize:vertical;min-height:90px;font-size:12px;}
+.fg input:focus,.fg textarea:focus{border-color:var(--accent);}
+.primary-btn{width:100%;background:var(--accent);color:#000;border:none;border-radius:9px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;transition:all .15s;}
+.primary-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,255,136,.3);}
+.primary-btn:disabled{opacity:.5;cursor:not-allowed;}
+.back-btn{background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;padding:6px 0;font-family:'Syne',sans-serif;display:flex;align-items:center;gap:5px;margin-bottom:16px;transition:color .2s;}
+.back-btn:hover{color:var(--text);}
+.err-msg{background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.2);border-radius:8px;padding:11px 14px;font-size:12px;color:#ff8080;margin-bottom:14px;display:none;}
+.err-msg.show{display:block;}
+.success-box{text-align:center;padding:14px 0;}
+.suc-icon{width:66px;height:66px;border-radius:50%;background:rgba(0,255,136,.1);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 16px;}
+.suc-title{font-size:18px;font-weight:800;margin-bottom:8px;}
+.suc-msg{color:var(--muted);font-size:13px;line-height:1.6;}
+.order-badge{display:inline-block;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);color:#a78bfa;font-family:'Space Mono',monospace;font-size:12px;padding:5px 14px;border-radius:5px;margin:12px 0;}
+
+/* SHARED */
+.page-header{padding:40px 20px 0;text-align:center;}
+.page-header h2{font-size:24px;font-weight:800;letter-spacing:-.5px;margin-bottom:8px;}
+.page-header p{font-size:14px;color:var(--muted);line-height:1.6;}
+
+@media(max-width:680px){
+  .nav-tabs{display:none;}.hamburger{display:block;}
+  .menu-grid{grid-template-columns:repeat(2,1fr);}
+  .dl-platforms{grid-template-columns:repeat(3,1fr);}
+  .input-row{flex-direction:column;}
+  .chat-box{min-height:300px;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo" onclick="showSection('home');return false;">Dev<em>Clin</em></a>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showSection('home')">🏠 Home</button>
+    <button class="nav-tab" onclick="showSection('shop')">🛍 Shop</button>
+    <button class="nav-tab" onclick="showSection('downloader')">⬇️ Downloader</button>
+    <button class="nav-tab" onclick="showSection('ai')">🤖 AI Chat</button>
+    <button class="nav-tab" onclick="showSection('contact')">📞 Contact</button>
+    <button class="nav-tab" onclick="showSection('about')">ℹ️ About</button>
+    <button class="nav-tab" onclick="showSection('rate')">⭐ Rate Us</button>
+  </div>
+  <button class="hamburger" onclick="document.getElementById('mobnav').classList.toggle('open')">☰</button>
+</nav>
+<div class="mob-nav" id="mobnav">
+  <button class="mob-tab active" onclick="showSection('home');closeMob()">🏠 Home</button>
+  <button class="mob-tab" onclick="showSection('shop');closeMob()">🛍 Shop</button>
+  <button class="mob-tab" onclick="showSection('downloader');closeMob()">⬇️ Downloader</button>
+  <button class="mob-tab" onclick="showSection('ai');closeMob()">🤖 AI Chat</button>
+  <button class="mob-tab" onclick="showSection('contact');closeMob()">📞 Contact</button>
+  <button class="mob-tab" onclick="showSection('about');closeMob()">ℹ️ About</button>
+  <button class="mob-tab" onclick="showSection('rate');closeMob()">⭐ Rate Us</button>
+</div>
+
+<!-- HOME -->
+<div class="section active" id="sec-home">
+  <div class="hero">
+    <div class="live-badge"><div class="live-dot"></div>SKYLINE TECHNOLOGIES</div>
+    <h1>Welcome to<br><span class="green">Dev Clin</span></h1>
+    <p>Your digital store — products, downloader, AI assistant and more. All in one place.</p>
+    <div class="menu-grid">
+      <div class="menu-card" onclick="showSection('shop')"><div class="icon">🛍</div><div class="label">Shop</div></div>
+      <div class="menu-card" onclick="showSection('downloader')"><div class="icon">⬇️</div><div class="label">Downloader</div></div>
+      <div class="menu-card" onclick="showSection('ai')"><div class="icon">🤖</div><div class="label">AI Chat</div></div>
+      <div class="menu-card" onclick="showSection('contact')"><div class="icon">📞</div><div class="label">Contact</div></div>
+      <div class="menu-card" onclick="showSection('about')"><div class="icon">ℹ️</div><div class="label">About</div></div>
+      <div class="menu-card" onclick="showSection('rate')"><div class="icon">⭐</div><div class="label">Rate Us</div></div>
+    </div>
+  </div>
+  <div class="stats">
+    <div class="stat"><span class="stat-n" id="sP">—</span><span class="stat-l">Products</span></div>
+    <div class="stat"><span class="stat-n" id="sO">—</span><span class="stat-l">Delivered</span></div>
+    <div class="stat"><span class="stat-n" id="sU">—</span><span class="stat-l">Customers</span></div>
+  </div>
+</div>
+
+<!-- SHOP -->
+<div class="section" id="sec-shop">
+  <div class="shop-wrap">
+    <h2 class="sec-title">🛍 <span>Shop</span></h2>
+    <div class="cats" id="catsRow"><button class="cat-btn active" onclick="filterCat(this,'')">All</button></div>
+    <div id="skelGrid" class="skel-grid">
+      <div class="skel"><div class="skel-img"></div><div class="skel-body"><div class="skel-line s"></div><div class="skel-line m"></div><div class="skel-line"></div></div></div>
+      <div class="skel"><div class="skel-img"></div><div class="skel-body"><div class="skel-line s"></div><div class="skel-line m"></div><div class="skel-line"></div></div></div>
+      <div class="skel"><div class="skel-img"></div><div class="skel-body"><div class="skel-line s"></div><div class="skel-line m"></div><div class="skel-line"></div></div></div>
+    </div>
+    <div class="products-grid" id="prodsGrid" style="display:none"></div>
+    <div class="empty-msg" id="emptyProds" style="display:none">📭 No products in this category yet.</div>
+  </div>
+</div>
+
+<!-- DOWNLOADER -->
+<div class="section" id="sec-downloader">
+  <div class="dl-wrap">
+    <div class="page-header" style="padding-top:0;text-align:left;margin-bottom:24px">
+      <h2 class="sec-title">⬇️ <span>Downloader</span></h2>
+      <p style="color:var(--muted);font-size:14px">Paste a link from any platform below and download instantly.</p>
+    </div>
+    <div class="dl-platforms">
+      <div class="dl-plat active" data-plat="youtube" onclick="selPlat(this)"><div class="pi">▶️</div><div class="pn">YouTube</div></div>
+      <div class="dl-plat" data-plat="ytmusic" onclick="selPlat(this)"><div class="pi">🎵</div><div class="pn">YT Music</div></div>
+      <div class="dl-plat" data-plat="tiktok" onclick="selPlat(this)"><div class="pi">📱</div><div class="pn">TikTok</div></div>
+      <div class="dl-plat" data-plat="facebook" onclick="selPlat(this)"><div class="pi">📘</div><div class="pn">Facebook</div></div>
+      <div class="dl-plat" data-plat="instagram" onclick="selPlat(this)"><div class="pi">📸</div><div class="pn">Instagram</div></div>
+      <div class="dl-plat" data-plat="twitter" onclick="selPlat(this)"><div class="pi">🐦</div><div class="pn">Twitter/X</div></div>
+    </div>
+    <div class="input-row">
+      <input class="url-input" id="dlUrl" placeholder="Paste link here e.g. https://youtube.com/watch?v=..." onkeydown="if(event.key==='Enter')doDownload()">
+      <button class="dl-btn" id="dlBtn" onclick="doDownload()">Download ↓</button>
+    </div>
+    <div class="dl-loading" id="dlLoading"><div class="spinner"></div>Downloading, please wait…</div>
+    <div class="dl-error" id="dlError"></div>
+    <div class="dl-result" id="dlResult">
+      <div class="dl-title" id="dlTitle"></div>
+      <div class="dl-actions">
+        <a class="dl-link" id="dlMainLink" href="#" target="_blank" download>📥 Download File</a>
+        <a class="dl-link secondary" id="dlOpenLink" href="#" target="_blank">🔗 Open Link</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AI CHAT -->
+<div class="section" id="sec-ai">
+  <div class="ai-wrap">
+    <div class="page-header" style="padding:0 0 16px;text-align:left">
+      <h2 class="sec-title">🤖 <span>AI Assistant</span></h2>
+    </div>
+    <div class="chat-box" id="chatBox">
+      <div class="msg bot">👋 Hi! I'm your AI assistant powered by <strong>Dev Clin</strong>. Ask me anything — coding, writing, math, general questions. I'm here to help! 🧠</div>
+    </div>
+    <div class="ai-disclaimer">Powered by Claude AI · Dev Clin · Skyline Technologies</div>
+    <div class="chat-input-row" style="margin-top:10px">
+      <input class="chat-input" id="chatInput" placeholder="Ask me anything…" onkeydown="if(event.key==='Enter'&&!event.shiftKey)sendChat()">
+      <button class="send-btn" id="sendBtn" onclick="sendChat()">Send →</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT -->
+<div class="section" id="sec-contact">
+  <div class="contact-wrap">
+    <div class="page-header" style="padding:0 0 28px;text-align:left">
+      <h2 class="sec-title">📞 <span>Contact Us</span></h2>
+      <p>We're available to help. Reach us on any platform below.</p>
+    </div>
+    <a class="contact-card" href="https://wa.me/234XXXXXXXXX" target="_blank">
+      <div class="contact-icon">💬</div>
+      <div class="contact-info"><div class="cn">WhatsApp</div><div class="cs">Chat with us directly</div></div>
+    </a>
+    <a class="contact-card" href="https://instagram.com/skyline_tech" target="_blank">
+      <div class="contact-icon">📸</div>
+      <div class="contact-info"><div class="cn">Instagram</div><div class="cs">@skyline_tech</div></div>
+    </a>
+    <a class="contact-card" href="https://t.me/yourusername" target="_blank">
+      <div class="contact-icon">✈️</div>
+      <div class="contact-info"><div class="cn">Telegram</div><div class="cs">@yourusername</div></div>
+    </a>
+    <p style="font-size:12px;color:var(--muted);margin-top:20px;text-align:center">⚡ Response time: Usually within minutes</p>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div class="section" id="sec-about">
+  <div class="about-wrap">
+    <div class="page-header" style="padding:0 0 28px;text-align:left">
+      <h2 class="sec-title">ℹ️ <span>About Dev Clin</span></h2>
+    </div>
+    <div class="about-card">
+      <div class="about-title">🏙 <span>Skyline Technologies</span></div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.7">Elevating Digital Solutions — your one-stop platform for premium digital products, media, and tech services.</p>
+      <ul class="about-list">
+        <li>📦 Digital products — apps, docs, music, videos</li>
+        <li>🎓 Educational materials for all levels</li>
+        <li>💻 Tech gadgets and hardware</li>
+        <li>⬇️ Social media downloader</li>
+        <li>🤖 AI assistant powered by Claude</li>
+        <li>🛠 Custom development services</li>
+      </ul>
+    </div>
+    <div class="about-card">
+      <div class="about-title">💳 <span>How to Buy</span></div>
+      <ul class="about-list">
+        <li>1️⃣ Browse and pick a product in Shop</li>
+        <li>2️⃣ Send M-Pesa to the number shown</li>
+        <li>3️⃣ Paste your M-Pesa SMS confirmation</li>
+        <li>4️⃣ We verify and deliver to you fast ⚡</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- RATE -->
+<div class="section" id="sec-rate">
+  <div class="rate-wrap">
+    <div class="page-header" style="padding:0 0 28px;text-align:left">
+      <h2 class="sec-title">⭐ <span>Rate Us</span></h2>
+      <p>Your feedback helps us improve. Tell us how we're doing!</p>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px" id="rateBox">
+      <p style="font-size:14px;font-weight:600;margin-bottom:4px;text-align:center">How would you rate Dev Clin?</p>
+      <div class="stars" id="starsRow">
+        <span class="star" onclick="setStar(1)">⭐</span>
+        <span class="star" onclick="setStar(2)">⭐</span>
+        <span class="star" onclick="setStar(3)">⭐</span>
+        <span class="star" onclick="setStar(4)">⭐</span>
+        <span class="star" onclick="setStar(5)">⭐</span>
+      </div>
+      <div class="rate-form" id="rateForm">
+        <textarea class="rate-textarea" id="rateText" placeholder="Tell us about your experience (optional)…"></textarea>
+        <div class="err-msg" id="rateErr"></div>
+        <button class="rate-submit" id="rateSubmit" onclick="submitRating()">Submit Review ✓</button>
+      </div>
+    </div>
+    <div style="display:none;text-align:center;padding:40px 20px" id="rateThanks">
+      <div style="font-size:48px;margin-bottom:14px">🙏</div>
+      <h3 style="font-size:18px;font-weight:800;margin-bottom:8px">Thank you!</h3>
+      <p style="color:var(--muted);font-size:14px">Your review has been submitted.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal-wrap">
+    <div class="modal" id="modal">
+      <button class="m-close" onclick="closeModal()">✕</button>
+      <div id="modalInner"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = '';
+let products = [], payInfo = {name:'Clinton Oduor',number:'0743810633'}, activeProd = null, selectedStar = 0, chatHistory = [];
+
+// ── NAVIGATION ──────────────────────────────
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab,.mob-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  document.querySelectorAll('.nav-tab,.mob-tab').forEach(t => {
+    if(t.textContent.toLowerCase().includes(id==='home'?'home':id==='ai'?'ai':id)) t.classList.add('active');
+  });
+  if(id==='shop' && !products.length) loadShop();
+  window.scrollTo(0,0);
+}
+function closeMob() { document.getElementById('mobnav').classList.remove('open'); }
+
+// ── INIT ─────────────────────────────────────
+async function init() {
+  loadStats();
+  loadPayInfo();
+}
+
+async function loadStats() {
+  try {
+    const d = await (await fetch(API+'/api/stats')).json();
+    document.getElementById('sP').textContent = d.products??0;
+    document.getElementById('sO').textContent = d.orders??0;
+    document.getElementById('sU').textContent = d.users??0;
+  } catch(e){}
+}
+
+async function loadPayInfo() {
+  try { payInfo = await (await fetch(API+'/api/payment-info')).json(); } catch(e){}
+}
+
+// ── SHOP ─────────────────────────────────────
+let catsLoaded = false;
+async function loadShop() {
+  if(!catsLoaded) { await loadCats(); catsLoaded = true; }
+  loadProducts('');
+}
+
+async function loadCats() {
+  try {
+    const cats = await (await fetch(API+'/api/categories')).json();
+    const row = document.getElementById('catsRow');
+    cats.forEach(c => {
+      const b = document.createElement('button');
+      b.className='cat-btn'; b.dataset.cat=c.id;
+      b.textContent=c.label;
+      b.onclick=()=>filterCat(b,c.id);
+      row.appendChild(b);
+    });
+  } catch(e){}
+}
+
+async function loadProducts(cat) {
+  document.getElementById('skelGrid').style.display='grid';
+  document.getElementById('prodsGrid').style.display='none';
+  document.getElementById('emptyProds').style.display='none';
+  try {
+    const url = cat ? `${API}/api/products?category=${cat}` : `${API}/api/products`;
+    products = await (await fetch(url)).json();
+    renderProducts();
+  } catch(e) {
+    document.getElementById('skelGrid').style.display='none';
+    document.getElementById('emptyProds').style.display='block';
+  }
+}
+
+function renderProducts() {
+  document.getElementById('skelGrid').style.display='none';
+  const grid = document.getElementById('prodsGrid');
+  if(!products.length) {
+    grid.style.display='none';
+    document.getElementById('emptyProds').style.display='block'; return;
+  }
+  grid.innerHTML = products.map(p => {
+    const sale = p.sale_price>0 && p.sale_price<p.price_value;
+    const dp = sale?`KSh ${p.sale_price.toLocaleString()}`:p.price;
+    const img = p.image_url
+      ? `<img src="${h(p.image_url)}" class="prod-img" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'prod-placeholder',textContent:'${h(p.icon||'📦')}'}))">`
+      : `<div class="prod-placeholder">${h(p.icon||'📦')}</div>`;
+    return `<div class="prod-card" onclick="openProduct('${h(p.id)}')">
+      ${sale?'<div class="sale-tag">SALE</div>':''}
+      ${img}
+      <div class="prod-body">
+        <div class="prod-cat">${h(p.category)}</div>
+        <div class="prod-name">${h(p.name)}</div>
+        <div class="prod-desc">${h(p.desc)}</div>
+        <div class="prod-footer">
+          <div class="prod-price">${sale?`<span class="price-orig">${h(p.price)}</span><span class="price-sale">${h(dp)}</span>`:h(dp)}</div>
+          <span class="prod-type">${h(p.type)}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  grid.style.display='grid';
+}
+
+function filterCat(btn, cat) {
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  loadProducts(cat);
+}
+
+// ── PRODUCT MODAL ─────────────────────────────
+function openProduct(id) {
+  const p = products.find(x=>x.id===id);
+  if(!p) return;
+  activeProd = p;
+  const sale = p.sale_price>0 && p.sale_price<p.price_value;
+  const dp = sale?`KSh ${p.sale_price.toLocaleString()}`:p.price;
+  const img = p.image_url
+    ? `<img src="${h(p.image_url)}" class="m-img" alt="${h(p.name)}">`
+    : `<div class="m-img-ph">${h(p.icon||'📦')}</div>`;
+
+  document.getElementById('modalInner').innerHTML = `
+    ${img}
+    <div class="m-body">
+      <div class="m-cat">${h(p.category)} · ${h(p.type)}</div>
+      <div class="m-name">${h(p.name)}</div>
+      <div class="m-desc">${h(p.desc)}</div>
+      <div class="m-price">${sale?`<span style="text-decoration:line-through;color:var(--muted);font-size:14px;margin-right:8px">${h(p.price)}</span><span style="color:var(--accent3)">${h(dp)}</span>`:h(dp)}</div>
+      <div class="step active" id="ms1">
+        <button class="primary-btn" onclick="mgs(2)">Buy Now — ${h(dp)}</button>
+      </div>
+      <div class="step" id="ms2">
+        <button class="back-btn" onclick="mgs(1)">← Back</button>
+        <div class="step-hd"><div class="step-n">1</div>Send M-Pesa Payment</div>
+        <div class="mpesa-box">
+          <div class="mp-label">Send to</div>
+          <div class="mp-name">${h(payInfo.name)}</div>
+          <div class="mp-num">${h(payInfo.number)}</div>
+          <div class="mp-amt">Amount: <strong>${h(dp)}</strong></div>
+        </div>
+        <button class="primary-btn" onclick="mgs(3)">I've Sent Payment →</button>
+      </div>
+      <div class="step" id="ms3">
+        <button class="back-btn" onclick="mgs(2)">← Back</button>
+        <div class="step-hd"><div class="step-n">2</div>Confirm Your Order</div>
+        <div class="err-msg" id="mErr"></div>
+        <div class="fg"><label>Full Name</label><input id="mName" placeholder="e.g. John Doe"></div>
+        <div class="fg"><label>Phone Number</label><input id="mPhone" type="tel" placeholder="e.g. 0712345678"></div>
+        <div class="fg"><label>Paste M-Pesa SMS Confirmation</label><textarea id="mMpesa" placeholder="e.g. QHX1234567 Confirmed. Ksh500 sent to Clinton Oduor..."></textarea></div>
+        <button class="primary-btn" id="mSubBtn" onclick="submitOrder()">Submit Order ✓</button>
+      </div>
+      <div class="step" id="ms4">
+        <div class="success-box">
+          <div class="suc-icon">✅</div>
+          <div class="suc-title">Order Received!</div>
+          <div class="order-badge" id="mOrderBadge">Order #—</div>
+          <div class="suc-msg" id="mSuccessMsg"></div>
+          <button class="primary-btn" style="margin-top:18px" onclick="closeModal()">Back to Shop</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function mgs(n) { [1,2,3,4].forEach(i=>{const e=document.getElementById('ms'+i);if(e)e.classList.toggle('active',i===n);}); }
+
+async function submitOrder() {
+  const name=document.getElementById('mName').value.trim();
+  const phone=document.getElementById('mPhone').value.trim();
+  const mpesa=document.getElementById('mMpesa').value.trim();
+  const errEl=document.getElementById('mErr');
+  const btn=document.getElementById('mSubBtn');
+  errEl.classList.remove('show');
+  if(!name){showMErr('Please enter your full name.');return;}
+  if(!phone){showMErr('Please enter your phone number.');return;}
+  if(!mpesa||mpesa.length<20){showMErr('Please paste the full M-Pesa confirmation SMS.');return;}
+  btn.disabled=true; btn.textContent='Submitting…';
+  try {
+    const res=await fetch(API+'/api/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({product_id:activeProd.id,full_name:name,phone,mpesa_msg:mpesa})});
+    const d=await res.json();
+    if(d.success){
+      document.getElementById('mOrderBadge').textContent=`Order #${d.order_id}`;
+      document.getElementById('mSuccessMsg').textContent=d.message;
+      mgs(4);
+    } else { showMErr(d.error||'Something went wrong.'); btn.disabled=false; btn.textContent='Submit Order ✓'; }
+  } catch(e){ showMErr('Network error. Try again.'); btn.disabled=false; btn.textContent='Submit Order ✓'; }
+}
+function showMErr(m){const e=document.getElementById('mErr');e.textContent=m;e.classList.add('show');}
+function closeModal(){document.getElementById('overlay').classList.remove('open');document.body.style.overflow='';activeProd=null;}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+
+// ── DOWNLOADER ───────────────────────────────
+let selPlatform = 'youtube';
+function selPlat(el) {
+  document.querySelectorAll('.dl-plat').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  selPlatform = el.dataset.plat;
+}
+
+async function doDownload() {
+  const url = document.getElementById('dlUrl').value.trim();
+  const errEl = document.getElementById('dlError');
+  const resEl = document.getElementById('dlResult');
+  const loadEl = document.getElementById('dlLoading');
+  const btn = document.getElementById('dlBtn');
+
+  errEl.classList.remove('show'); resEl.classList.remove('show');
+  if(!url) { errEl.textContent='Please paste a link first.'; errEl.classList.add('show'); return; }
+
+  btn.disabled=true; loadEl.classList.add('show');
+  try {
+    const res = await fetch(API+'/api/download',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url,platform:selPlatform})});
+    const d = await res.json();
+    loadEl.classList.remove('show');
+    if(d.error){ errEl.textContent=d.error; errEl.classList.add('show'); }
+    else {
+      document.getElementById('dlTitle').textContent = d.title||'Download ready';
+      document.getElementById('dlMainLink').href = d.url;
+      document.getElementById('dlOpenLink').href = d.url;
+      resEl.classList.add('show');
+    }
+  } catch(e){ loadEl.classList.remove('show'); errEl.textContent='Network error. Try again.'; errEl.classList.add('show'); }
+  btn.disabled=false;
+}
+
+// ── AI CHAT ───────────────────────────────────
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if(!msg) return;
+  input.value='';
+  const btn = document.getElementById('sendBtn');
+  btn.disabled=true;
+
+  appendMsg(msg,'user');
+  chatHistory.push({role:'user',content:msg});
+
+  const typingEl = appendMsg('Thinking…','bot typing');
+
+  try {
+    const res = await fetch(API+'/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,history:chatHistory.slice(-10)})});
+    const d = await res.json();
+    typingEl.remove();
+    const reply = d.reply||d.error||'Sorry, I had trouble responding.';
+    appendMsg(reply,'bot');
+    chatHistory.push({role:'assistant',content:reply});
+  } catch(e){ typingEl.remove(); appendMsg('Network error. Please try again.','bot'); }
+  btn.disabled=false;
+}
+
+function appendMsg(text, cls) {
+  const box = document.getElementById('chatBox');
+  const el = document.createElement('div');
+  el.className='msg '+cls;
+  el.textContent=text;
+  box.appendChild(el);
+  box.scrollTop=box.scrollHeight;
+  return el;
+}
+
+// ── RATINGS ───────────────────────────────────
+function setStar(n) {
+  selectedStar=n;
+  document.querySelectorAll('.star').forEach((s,i)=>s.classList.toggle('active',i<n));
+  document.getElementById('rateForm').classList.add('show');
+}
+
+async function submitRating() {
+  const review = document.getElementById('rateText').value.trim();
+  const btn = document.getElementById('rateSubmit');
+  if(!selectedStar){ document.getElementById('rateErr').textContent='Please select a star rating.'; document.getElementById('rateErr').classList.add('show'); return; }
+  btn.disabled=true; btn.textContent='Submitting…';
+  try {
+    await fetch(API+'/api/review',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({rating:selectedStar,review,type:'bot'})});
+  } catch(e){}
+  document.getElementById('rateBox').style.display='none';
+  document.getElementById('rateThanks').style.display='block';
+}
+
+// ── UTILS ─────────────────────────────────────
+function h(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+init();
+</script>
+</body>
+</html>
