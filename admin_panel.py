@@ -1433,7 +1433,7 @@ def api_create_order():
 
     expected_amount = float(prod.get("sale_price") or 0)
     if not expected_amount or expected_amount <= 0:
-        price_str = str(prod.get("price", "0")).replace("KSh", "").replace("ksh", "").replace(",", "").strip()
+        price_str = str(prod.get("price", "0")).replace("KSh", "").replace("ksh", "").replace("Ksh", "").replace(",", "").replace("KES", "").strip()
         try:
             expected_amount = float(price_str)
         except:
@@ -1459,8 +1459,12 @@ def api_create_order():
     order_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
 
     if receipt_no != "N/A":
+        if receipt_no != "N/A":
+    try:
         mark_transaction_used(receipt_no, 0, prod_id)
-
+    except:
+        conn.execute("INSERT OR IGNORE INTO used_transactions (txn_id, user_id, product_id, used_at) VALUES (?,?,?,?)", (receipt_no, 0, prod_id, datetime.now().isoformat()))
+        conn.commit()
     conn.commit()
     conn.close()
 
