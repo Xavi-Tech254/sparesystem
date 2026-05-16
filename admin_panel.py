@@ -1415,100 +1415,82 @@ def api_create_order():
     if request.method == "OPTIONS":
         return "", 204
     data = request.get_json(force=True, silent=True) or {}
-    prod_id = data.get("product_id", "").strip()
+    prod_id   = data.get("product_id", "").strip()
     full_name = data.get("full_name", "").strip()
-    phone = data.get("phone", "").strip()
+    phone     = data.get("phone", "").strip()
     mpesa_msg = data.get("mpesa_msg", "").strip()
+
     if not all([prod_id, full_name, phone, mpesa_msg]):
-        return jsonify({"error": "Missing required fields"}), 400
+        return jsonify({"error": "Please fill in all fields."}), 400
+
     conn = get_db()
     prod = conn.execute("SELECT * FROM products WHERE id=? AND active=1", (prod_id,)).fetchone()
     if not prod:
         conn.close()
-        return jsonify({"error": "Product not found"}), 404
-    msg_upper = mpesa_msg.upper()
-    if not any(k in msg_upper for k in ["CONFIRMED", "KSH", "KES", "MPESA", "M-PESA"]):
+        return jsonify({"error": "Product not found."}), 404
+
+    prod = dict(prod)
+
+    expected_amount = float(prod.get("sale_price") or 0)
+    if not expected_amount or expected_amount <= 0:
+        price_str = str(prod.get("price", "0")).replace("KSh", "").replace("ksh", "").replace(",", "").strip()
+        try:
+            expected_amount = float(price_str)
+        except:
+            expected_amount = 0.0
+
+    ok, result = parse_mpesa_message(mpesa_msg, expected_amount)
+
+    if not ok:
         conn.close()
-        return jsonify({"error": "Doesn't look like an M-Pesa message. Please paste the full SMS."}), 400
-    txn_match = _re.search(r'\b([A-Z0-9]{10})\b', mpesa_msg)
-    txn_code = txn_match.group(1) if txn_match else None
-    if txn_code:
-        used = conn.execute("SELECT txn_id FROM used_transactions WHERE txn_id=?", (txn_code,)).fetchone()
-        if used:
-            conn.close()
-            return jsonify({"error": "This M-Pesa transaction has already been used."}), 400
+        error_clean = result.replace("*", "").replace("_", "").replace("`", "")
+        return jsonify({"error": error_clean}), 400
+
+    receipt_no = result.get("receipt", "N/A")
+
+    if receipt_no != "N/A" and is_transaction_used(receipt_no):
+        conn.close()
+        return jsonify({"error": "This M-Pesa transaction has already been used to claim a product."}), 400
+
     conn.execute(
         "INSERT INTO orders (user_id, username, full_name, product_id, product_name, amount, status, mpesa_msg, created_at) VALUES (?,?,?,?,?,?,?,?,?)",
-        (0, f"web:{phone}", full_name, prod_id, prod["name"], prod["price"], "pending", mpesa_msg, datetime.now().isoformat())
+        (0, f"web:{phone}", full_name, prod_id, prod["name"], prod["price"], "verified", mpesa_msg, datetime.now().isoformat())
     )
     order_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
-    if txn_code:
-        conn.execute("INSERT OR IGNORE INTO used_transactions (txn_id, user_id, product_id, used_at) VALUES (?,?,?,?)", (txn_code, 0, prod_id, datetime.now().isoformat()))
+
+    if receipt_no != "N/A":
+        mark_transaction_used(receipt_no, 0, prod_id)
+
     conn.commit()
+    conn.close()
+
+    download_link = None
+    if prod.get("link"):
+        try:
+            base_url = os.environ.get("DOWNLOAD_BASE_URL", "https://sparesystem.onrender.com")
+            token = generate_download_token(0, prod_id, prod["link"])
+            download_link = f"{base_url}/download/{token}"
+        except:
+            download_link = prod["link"]
+
     try:
         admin_id = int(os.environ.get("ADMIN_ID", "6105493227"))
-        msg = f"🌐 *New Web Order #{order_id}*\n\n👤 *Name:* {full_name}\n📱 *Phone:* {phone}\n📦 *Product:* {prod['name']}\n💰 *Amount:* {prod['price']}\n\n💳 *M-Pesa SMS:*\n`{mpesa_msg}`"
+        msg = (
+            f"✅ *Web Order Verified #{order_id}*\n\n"
+            f"👤 *Name:* {full_name}\n"
+            f"📱 *Phone:* {phone}\n"
+            f"📦 *Product:* {prod['name']}\n"
+            f"💰 *Amount:* KSh {result['amount']:,.0f}\n"
+            f"🧾 *Receipt:* `{receipt_no}`\n"
+            f"{'✅ Download auto-sent.' if download_link else '⚠️ No file link set.'}"
+        )
         send_telegram(admin_id, msg)
     except:
         pass
-    conn.close()
-    return jsonify({"success": True, "order_id": order_id, "message": f"Order received! We'll review your payment and deliver {prod['name']} to you shortly."})
 
-
-@app.route("/api/download", methods=["POST", "OPTIONS"])
-def api_download():
-    if request.method == "OPTIONS":
-        return "", 204
-    data = request.get_json(force=True, silent=True) or {}
-    url = data.get("url", "").strip()
-    if not url:
-        return jsonify({"error": "Please provide a URL."}), 400
-    import asyncio
-    try:
-        loop = asyncio.new_event_loop()
-        result = loop.run_until_complete(download_media_cobalt(url))
-        loop.close()
-        return jsonify(result)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-@app.route("/api/ai", methods=["POST", "OPTIONS"])
-def api_ai():
-    if request.method == "OPTIONS":
-        return "", 204
-    data = request.get_json(force=True, silent=True) or {}
-    message = data.get("message", "").strip()
-    history = data.get("history", [])
-    if not message:
-        return jsonify({"error": "No message provided."}), 400
-    import asyncio
-    try:
-        loop = asyncio.new_event_loop()
-        reply = loop.run_until_complete(ask_claude(message, history))
-        loop.close()
-        return jsonify({"reply": reply})
-    except Exception as e:
-        return jsonify({"error": "AI unavailable right now."}), 500
-
-
-@app.route("/api/review", methods=["POST", "OPTIONS"])
-def api_review():
-    if request.method == "OPTIONS":
-        return "", 204
-    data = request.get_json(force=True, silent=True) or {}
-    rating = data.get("rating", 0)
-    review = data.get("review", "").strip()
-    review_type = data.get("type", "bot")
-    try:
-        conn = get_db()
-        conn.execute(
-            "INSERT INTO reviews (user_id, full_name, rating, review, type, created_at) VALUES (?,?,?,?,?,?)",
-            (0, "Web User", rating, review, review_type, datetime.now().isoformat())
-        )
-        conn.commit()
-        conn.close()
-        return jsonify({"success": True})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
+    return jsonify({
+        "success": True,
+        "order_id": order_id,
+        "download_link": download_link,
+        "message": f"✅ Payment verified! Your order for {prod['name']} is confirmed."
+    })
