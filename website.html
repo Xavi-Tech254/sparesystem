@@ -600,9 +600,9 @@ async function submitOrder() {
     const res=await fetch(API+'/api/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({product_id:activeProd.id,full_name:name,phone,mpesa_msg:mpesa})});
     const d=await res.json();
     if(d.success){
-      document.getElementById('mOrderBadge').textContent=`Order #${d.order_id}`;
-      document.getElementById('mSuccessMsg').textContent=d.message;
-      mgs(4);
+    document.getElementById('mOrderBadge').textContent=`Order #${d.order_id}`;
+    if(d.download_link){document.getElementById('mSuccessMsg').innerHTML=d.message+'<br><br><a href="'+d.download_link+'" target="_blank" style="display:inline-block;margin-top:12px;background:#00ff88;color:#000;padding:12px 24px;border-radius:9px;font-weight:700;text-decoration:none;">📥 Download Your File</a><br><small style="color:#5a5a7a;font-size:11px;margin-top:8px;display:block">One-time link · expires in 24hrs</small>';}else{document.getElementById('mSuccessMsg').textContent=d.message;}
+    mgs(4);
     } else { showMErr(d.error||'Something went wrong.'); btn.disabled=false; btn.textContent='Submit Order ✓'; }
   } catch(e){ showMErr('Network error. Try again.'); btn.disabled=false; btn.textContent='Submit Order ✓'; }
 }
