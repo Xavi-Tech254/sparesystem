@@ -1333,3 +1333,182 @@ def bot_settings():
         sms_verify_checked="checked" if settings.get("sms_verify_enabled","0")=="1" else ""
     )
     return render_page(content, "settings")
+    from flask import jsonify, send_from_directory
+import re as _re
+
+
+@app.after_request
+def add_cors(response):
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    return response
+
+
+@app.route("/shop")
+@app.route("/shop/")
+def shop_home():
+    return send_from_directory(".", "website.html")
+
+
+@app.route("/api/categories")
+def api_categories():
+    conn = get_db()
+    cats = conn.execute("SELECT * FROM categories ORDER BY label").fetchall()
+    conn.close()
+    return jsonify([dict(c) for c in cats])
+
+
+@app.route("/api/products")
+def api_products():
+    category = request.args.get("category", "")
+    conn = get_db()
+    if category:
+        rows = conn.execute("SELECT * FROM products WHERE active=1 AND category=? ORDER BY name", (category,)).fetchall()
+    else:
+        rows = conn.execute("SELECT * FROM products WHERE active=1 ORDER BY category, name").fetchall()
+    conn.close()
+    products = []
+    for p in rows:
+        d = dict(p)
+        d.pop("link", None)
+        products.append(d)
+    return jsonify(products)
+
+
+@app.route("/api/products/<prod_id>")
+def api_product(prod_id):
+    conn = get_db()
+    row = conn.execute("SELECT * FROM products WHERE id=? AND active=1", (prod_id,)).fetchone()
+    conn.close()
+    if not row:
+        return jsonify({"error": "Not found"}), 404
+    d = dict(row)
+    d.pop("link", None)
+    return jsonify(d)
+
+
+@app.route("/api/payment-info")
+def api_payment_info():
+    try:
+        conn = get_db()
+        rows = conn.execute("SELECT key, value FROM settings WHERE key IN ('mpesa_name','mpesa_number')").fetchall()
+        conn.close()
+        info = {r["key"]: r["value"] for r in rows}
+        return jsonify({"name": info.get("mpesa_name", "Clinton Oduor"), "number": info.get("mpesa_number", "0743810633")})
+    except:
+        return jsonify({"name": "Clinton Oduor", "number": "0743810633"})
+
+
+@app.route("/api/stats")
+def api_shop_stats():
+    conn = get_db()
+    products = conn.execute("SELECT COUNT(*) FROM products WHERE active=1").fetchone()[0]
+    orders = conn.execute("SELECT COUNT(*) FROM orders WHERE status='delivered'").fetchone()[0]
+    users = conn.execute("SELECT COUNT(*) FROM users").fetchone()[0]
+    conn.close()
+    return jsonify({"products": products, "orders": orders, "users": users})
+
+
+@app.route("/api/orders", methods=["POST", "OPTIONS"])
+def api_create_order():
+    if request.method == "OPTIONS":
+        return "", 204
+    data = request.get_json(force=True, silent=True) or {}
+    prod_id = data.get("product_id", "").strip()
+    full_name = data.get("full_name", "").strip()
+    phone = data.get("phone", "").strip()
+    mpesa_msg = data.get("mpesa_msg", "").strip()
+    if not all([prod_id, full_name, phone, mpesa_msg]):
+        return jsonify({"error": "Missing required fields"}), 400
+    conn = get_db()
+    prod = conn.execute("SELECT * FROM products WHERE id=? AND active=1", (prod_id,)).fetchone()
+    if not prod:
+        conn.close()
+        return jsonify({"error": "Product not found"}), 404
+    msg_upper = mpesa_msg.upper()
+    if not any(k in msg_upper for k in ["CONFIRMED", "KSH", "KES", "MPESA", "M-PESA"]):
+        conn.close()
+        return jsonify({"error": "Doesn't look like an M-Pesa message. Please paste the full SMS."}), 400
+    txn_match = _re.search(r'\b([A-Z0-9]{10})\b', mpesa_msg)
+    txn_code = txn_match.group(1) if txn_match else None
+    if txn_code:
+        used = conn.execute("SELECT txn_id FROM used_transactions WHERE txn_id=?", (txn_code,)).fetchone()
+        if used:
+            conn.close()
+            return jsonify({"error": "This M-Pesa transaction has already been used."}), 400
+    conn.execute(
+        "INSERT INTO orders (user_id, username, full_name, product_id, product_name, amount, status, mpesa_msg, created_at) VALUES (?,?,?,?,?,?,?,?,?)",
+        (0, f"web:{phone}", full_name, prod_id, prod["name"], prod["price"], "pending", mpesa_msg, datetime.now().isoformat())
+    )
+    order_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
+    if txn_code:
+        conn.execute("INSERT OR IGNORE INTO used_transactions (txn_id, user_id, product_id, used_at) VALUES (?,?,?,?)", (txn_code, 0, prod_id, datetime.now().isoformat()))
+    conn.commit()
+    try:
+        admin_id = int(os.environ.get("ADMIN_ID", "6105493227"))
+        msg = f"🌐 *New Web Order #{order_id}*\n\n👤 *Name:* {full_name}\n📱 *Phone:* {phone}\n📦 *Product:* {prod['name']}\n💰 *Amount:* {prod['price']}\n\n💳 *M-Pesa SMS:*\n`{mpesa_msg}`"
+        send_telegram(admin_id, msg)
+    except:
+        pass
+    conn.close()
+    return jsonify({"success": True, "order_id": order_id, "message": f"Order received! We'll review your payment and deliver {prod['name']} to you shortly."})
+
+
+@app.route("/api/download", methods=["POST", "OPTIONS"])
+def api_download():
+    if request.method == "OPTIONS":
+        return "", 204
+    data = request.get_json(force=True, silent=True) or {}
+    url = data.get("url", "").strip()
+    if not url:
+        return jsonify({"error": "Please provide a URL."}), 400
+    import asyncio
+    try:
+        loop = asyncio.new_event_loop()
+        result = loop.run_until_complete(download_media_cobalt(url))
+        loop.close()
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/ai", methods=["POST", "OPTIONS"])
+def api_ai():
+    if request.method == "OPTIONS":
+        return "", 204
+    data = request.get_json(force=True, silent=True) or {}
+    message = data.get("message", "").strip()
+    history = data.get("history", [])
+    if not message:
+        return jsonify({"error": "No message provided."}), 400
+    import asyncio
+    try:
+        loop = asyncio.new_event_loop()
+        reply = loop.run_until_complete(ask_claude(message, history))
+        loop.close()
+        return jsonify({"reply": reply})
+    except Exception as e:
+        return jsonify({"error": "AI unavailable right now."}), 500
+
+
+@app.route("/api/review", methods=["POST", "OPTIONS"])
+def api_review():
+    if request.method == "OPTIONS":
+        return "", 204
+    data = request.get_json(force=True, silent=True) or {}
+    rating = data.get("rating", 0)
+    review = data.get("review", "").strip()
+    review_type = data.get("type", "bot")
+    try:
+        conn = get_db()
+        conn.execute(
+            "INSERT INTO reviews (user_id, full_name, rating, review, type, created_at) VALUES (?,?,?,?,?,?)",
+            (0, "Web User", rating, review, review_type, datetime.now().isoformat())
+        )
+        conn.commit()
+        conn.close()
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
