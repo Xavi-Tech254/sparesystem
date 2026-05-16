@@ -1333,7 +1333,7 @@ def bot_settings():
         sms_verify_checked="checked" if settings.get("sms_verify_enabled","0")=="1" else ""
     )
     return render_page(content, "settings")
-    from flask import jsonify, send_from_directory
+from flask import jsonify, send_from_directory
 import re as _re
 
 
