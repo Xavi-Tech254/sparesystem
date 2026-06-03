@@ -46,8 +46,8 @@ logger = logging.getLogger(__name__)
 # ══════════════════════════════════════════════
 #   CONFIG
 # ══════════════════════════════════════════════
-BOT_TOKEN  = os.environ.get("BOT_TOKEN", "8589728931:AAFTJDW94p_BOTr-q6AXua-hunOXmbXNSDQ")
-ADMIN_ID   = int(os.environ.get("ADMIN_ID", "6105493227"))
+BOT_TOKEN  = os.environ.get("BOT_TOKEN", "8926461408:AAExATKtfgG5I-8HSIbMl6PHu_FVPXMeK9s")
+ADMIN_ID   = int(os.environ.get("ADMIN_ID", "8888865797"))
 
 BOT_NAME   = "Dev Clin Market"
 BOT_HANDLE = "@DevClinBot"
