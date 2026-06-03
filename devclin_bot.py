@@ -50,7 +50,7 @@ BOT_TOKEN  = os.environ.get("BOT_TOKEN", "8926461408:AAExATKtfgG5I-8HSIbMl6PHu_F
 ADMIN_ID   = int(os.environ.get("ADMIN_ID", "8888865797"))
 
 BOT_NAME   = "Dev Clin Market"
-BOT_HANDLE = "@DevClinBot"
+BOT_HANDLE = "@SkylineHubBot"
 COMPANY    = "Skyline Technologies"
 TAGLINE    = "Elevating Digital Solutions"
 PORTFOLIO  = "https://devclin.netlify.app"
@@ -65,7 +65,7 @@ ME_LINK  = PORTFOLIO
 ME_LABEL = "👤 Me"
 ME_BIO   = "Built by Dev Clin 🚀\nSkyline Technologies — Elevating Digital Solutions"
 
-CYBER_IMAGE = "https://i.postimg.cc/CLHFDLbK/Gemini-Generated-Image-avf6o5avf6o5avf6.png"
+CYBER_IMAGE = "https://i.postimg.cc/1tPcd1RS/83245e16faefdb7b608aa0660db5bd8c.jpg"
 
 DOWNLOAD_EXPIRY_MINUTES = 39
 DOWNLOAD_MAX_CLICKS     = 3
